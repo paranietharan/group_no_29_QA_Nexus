@@ -10,3 +10,7 @@ IS4600 ITQA Test automation Assignment
 | 214216L  | Viyukshana K.    |
 | 214197C  | Shobikan V.      |
 | 214134H  | Mihunan V.       |
+
+# Requirements
+- Java 25
+- Maven 3.8.6 or above

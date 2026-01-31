@@ -11,7 +11,9 @@ public class LoginPage extends BasePage {
     private By usernameLocator = By.cssSelector("input[name='username'], input[id='username'], input[type='text']");
     private By passwordLocator = By.cssSelector("input[name='password'], input[id='password'], input[type='password']");
     private By loginButtonLocator = By.cssSelector("button[type='submit'], input[type='submit'], .login-btn, #loginBtn, button");
-    private By errorMessageLocator = By.cssSelector(".error-message, .alert-danger, .error, [role='alert'], .invalid-feedback, .text-danger");
+    private By errorMessageLocator = By.cssSelector(".error-message, .alert-danger, .error, [role='alert'], .text-danger");
+    private By validationFeedbackLocator = By.cssSelector(".invalid-feedback");
+    private By invalidInputLocator = By.cssSelector(".form-control.is-invalid");
 
     public LoginPage(WebDriver driver) {
         super(driver);
@@ -50,8 +52,31 @@ public class LoginPage extends BasePage {
 
     public boolean isErrorMessageDisplayed() {
         try {
+            // First check for general error messages
             WebElement error = wait.until(ExpectedConditions.visibilityOfElementLocated(errorMessageLocator));
             return error.isDisplayed();
+        } catch (Exception e) {
+            // Check for validation feedback (invalid-feedback divs with text)
+            return isValidationMessageDisplayed();
+        }
+    }
+
+    public boolean isValidationMessageDisplayed() {
+        try {
+            // Check if any input has is-invalid class
+            java.util.List<WebElement> invalidInputs = driver.findElements(invalidInputLocator);
+            if (!invalidInputs.isEmpty()) {
+                return true;
+            }
+            // Check for invalid-feedback divs with non-empty text
+            java.util.List<WebElement> feedbacks = driver.findElements(validationFeedbackLocator);
+            for (WebElement feedback : feedbacks) {
+                String text = feedback.getText();
+                if (text != null && !text.trim().isEmpty()) {
+                    return true;
+                }
+            }
+            return false;
         } catch (Exception e) {
             return false;
         }
@@ -61,6 +86,21 @@ public class LoginPage extends BasePage {
         try {
             WebElement error = wait.until(ExpectedConditions.visibilityOfElementLocated(errorMessageLocator));
             return error.getText();
+        } catch (Exception e) {
+            return getValidationMessageText();
+        }
+    }
+
+    public String getValidationMessageText() {
+        try {
+            java.util.List<WebElement> feedbacks = driver.findElements(validationFeedbackLocator);
+            for (WebElement feedback : feedbacks) {
+                String text = feedback.getText();
+                if (text != null && !text.trim().isEmpty()) {
+                    return text;
+                }
+            }
+            return "";
         } catch (Exception e) {
             return "";
         }
