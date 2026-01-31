@@ -41,8 +41,8 @@ public final class EnvConfig {
         return require("api.baseUrl");
     }
 
-    public String getAdminLoginPath() {
-        return require("api.auth.admin.loginPath");
+    public String getLoginPath() {
+        return require("api.auth.loginPath");
     }
 
     private String require(String key) {

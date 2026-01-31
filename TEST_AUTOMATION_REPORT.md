@@ -9,3 +9,9 @@
    - JSON: `target/cucumber-report.json`
    - XML:  `target/cucumber-report.xml`
 3. Open the HTML file in your browser for a visual report.
+
+
+#  Windows Command to Open the Report
+```shell
+start "C:\Users\Paranie\Desktop\codes\group_no_29_QA_Nexus\target\cucumber-report.html"   
+```

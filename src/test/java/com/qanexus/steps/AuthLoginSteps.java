@@ -12,7 +12,7 @@ import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class AuthAdminLoginSteps {
+public class AuthLoginSteps {
     private final TestContext context = new TestContext();
     private final AuthApi authApi = new AuthApi();
 
@@ -28,18 +28,36 @@ public class AuthAdminLoginSteps {
         context.setPassword(data.get("password"));
     }
 
-    @Given("valid username with invalid password")
-    public void validUsernameWithInvalidPassword() {
+    @Given("valid user credentials from {string}")
+    public void validUserCredentialsFrom(String resourcePath) {
+        Map<String, String> data = TestDataLoader.loadJsonMap(resourcePath);
+        context.setUsername(data.get("username"));
+        context.setPassword(data.get("password"));
+    }
+
+    @Given("admin username with invalid password")
+    public void adminUsernameWithInvalidPassword() {
         context.setUsername("admin");
         context.setPassword("wrongpassword123");
     }
 
-    @Given("non-existent user credentials")
-    public void nonExistentUserCredentials() {
-        context.setUsername("nonexistentuser@example.com");
+    @Given("user username with invalid password")
+    public void userUsernameWithInvalidPassword() {
+        context.setUsername("testuser");
+        context.setPassword("wrongpassword123");
+    }
+
+    @Given("non-existent admin credentials")
+    public void nonExistentAdminCredentials() {
+        context.setUsername("fakeadmin@example.com");
         context.setPassword("password123");
     }
 
+    @Given("non-existent user credentials")
+    public void nonExistentUserCredentials() {
+        context.setUsername("fakeuser@example.com");
+        context.setPassword("password123");
+    }
 
     @Given("empty username and password")
     public void emptyUsernameAndPassword() {
@@ -53,19 +71,16 @@ public class AuthAdminLoginSteps {
         context.setPassword("' OR '1'='1");
     }
 
-
-    @When("the admin login request is sent")
-    public void theAdminLoginRequestIsSent() {
-        Response response = authApi.loginAdmin(context.getUsername(), context.getPassword());
+    @When("the login request is sent")
+    public void theLoginRequestIsSent() {
+        Response response = authApi.login(context.getUsername(), context.getPassword());
         context.setResponse(response);
     }
-
 
     @Then("the response status code is {int}")
     public void theResponseStatusCodeIs(int statusCode) {
         Response response = context.getResponse();
         int actualStatusCode = response.statusCode();
-
         if (actualStatusCode != statusCode) {
             String errorMessage = String.format(
                 "Expected status code %d but got %d. Response body: %s",
@@ -77,7 +92,6 @@ public class AuthAdminLoginSteps {
         }
     }
 
-
     @Then("the response contains a non-empty token")
     public void theResponseContainsANonEmptyToken() {
         String token = context.getResponse().jsonPath().getString("token");
@@ -86,19 +100,14 @@ public class AuthAdminLoginSteps {
         context.setToken(token);
     }
 
-
     @Then("the token should be a valid JWT format")
     public void theTokenShouldBeAValidJWTFormat() {
         String token = context.getToken();
         assertNotNull(token, "Token should exist");
-
         String[] parts = token.split("\\.");
-        assertEquals(3, parts.length,
-            "JWT token should have 3 parts separated by dots, got: " + token);
-
+        assertEquals(3, parts.length, "JWT token should have 3 parts separated by dots, got: " + token);
         for (int i = 0; i < parts.length; i++) {
-            assertFalse(parts[i].isBlank(),
-                "JWT part " + i + " should not be empty");
+            assertFalse(parts[i].isBlank(), "JWT part " + i + " should not be empty");
         }
     }
 
@@ -109,16 +118,11 @@ public class AuthAdminLoginSteps {
         assertFalse(errorMessage.isBlank(), "Error message should not be blank");
     }
 
-
     @Then("the response does not contain error details")
     public void theResponseDoesNotContainErrorDetails() {
         String responseBody = context.getResponse().getBody().asString();
-
-        assertFalse(responseBody.contains("stack trace"),
-            "Response should not contain stack trace");
-        assertFalse(responseBody.toLowerCase().contains("database"),
-            "Response should not contain database details");
-        assertFalse(responseBody.toLowerCase().contains("exception"),
-            "Response should not contain exception details");
+        assertFalse(responseBody.contains("stack trace"), "Response should not contain stack trace");
+        assertFalse(responseBody.toLowerCase().contains("database"), "Response should not contain database details");
+        assertFalse(responseBody.toLowerCase().contains("exception"), "Response should not contain exception details");
     }
 }
