@@ -30,7 +30,7 @@ public class UILoginSteps {
     @Given("the login page is displayed")
     public void theLoginPageIsDisplayed() {
         initPages();
-        loginPage.navigateTo(config.getBaseUrl());
+        loginPage.navigateTo(config.getUiBaseUrl());
         assertTrue(loginPage.isLoginPageDisplayed(), "Login page should be displayed");
     }
 

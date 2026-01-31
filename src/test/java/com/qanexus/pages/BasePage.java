@@ -1,5 +1,6 @@
 package com.qanexus.pages;
 
+import com.qanexus.config.EnvConfig;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
@@ -11,11 +12,11 @@ import java.time.Duration;
 public abstract class BasePage {
     protected WebDriver driver;
     protected WebDriverWait wait;
-    private static final int TIMEOUT_SECONDS = 10;
+    protected static final EnvConfig config = EnvConfig.getInstance();
 
     public BasePage(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(TIMEOUT_SECONDS));
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(config.getExplicitTimeout()));
         PageFactory.initElements(driver, this);
     }
 

@@ -6,7 +6,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 
 public class LoginPage extends BasePage {
-    private static final String LOGIN_URL = "/ui/login";
+    private final String loginPath = config.getUiLoginPath();
 
     private By usernameLocator = By.cssSelector("input[name='username'], input[id='username'], input[type='text']");
     private By passwordLocator = By.cssSelector("input[name='password'], input[id='password'], input[type='password']");
@@ -20,7 +20,7 @@ public class LoginPage extends BasePage {
     }
 
     public void navigateTo(String baseUrl) {
-        driver.get(baseUrl + LOGIN_URL);
+        driver.get(baseUrl + loginPath);
         wait.until(ExpectedConditions.or(
             ExpectedConditions.presenceOfElementLocated(usernameLocator),
             ExpectedConditions.presenceOfElementLocated(passwordLocator)

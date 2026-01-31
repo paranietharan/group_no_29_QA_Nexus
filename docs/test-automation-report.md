@@ -26,4 +26,4 @@ Start-Process "http://localhost:8081/overview-features.html
 | Advanced    | `target/cucumber-advanced-report/cucumber-html-reports/overview-features.html` |
 
 ## Notes
-- When you open the .html report, you may get 404 error
+- When you open the .html report, you may get 404 error. So follow the steps to run the report server.

@@ -45,6 +45,47 @@ public final class EnvConfig {
         return require("api.auth.loginPath");
     }
 
+    public String getUiBaseUrl() {
+        return require("ui.baseUrl");
+    }
+
+    public String getUiLoginPath() {
+        return require("ui.loginPath");
+    }
+
+    public String getBrowser() {
+        return get("browser", "chrome");
+    }
+
+    public boolean isHeadless() {
+        return Boolean.parseBoolean(get("browser.headless", "false"));
+    }
+
+    public int getWindowWidth() {
+        return Integer.parseInt(get("browser.window.width", "1920"));
+    }
+
+    public int getWindowHeight() {
+        return Integer.parseInt(get("browser.window.height", "1080"));
+    }
+
+    public int getImplicitTimeout() {
+        return Integer.parseInt(get("timeout.implicit", "10"));
+    }
+
+    public int getExplicitTimeout() {
+        return Integer.parseInt(get("timeout.explicit", "10"));
+    }
+
+    public int getPageLoadTimeout() {
+        return Integer.parseInt(get("timeout.page.load", "30"));
+    }
+
+    public String get(String key, String defaultValue) {
+        String value = get(key);
+        return (value != null && !value.isBlank()) ? value : defaultValue;
+    }
+
     private String require(String key) {
         String value = get(key);
         if (value == null || value.isBlank()) {

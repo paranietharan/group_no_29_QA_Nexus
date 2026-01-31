@@ -14,3 +14,6 @@ IS4600 ITQA Test automation Assignment
 # Requirements
 - Java 25
 - Maven 3.8.6 or above
+
+
+- [Test Automation Docs](docs/test-automation-report.md)
