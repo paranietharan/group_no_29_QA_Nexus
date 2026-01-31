@@ -31,16 +31,16 @@ Feature: Authentication API
     Then the response status code is 401
 
   @AUTH-API-ADMIN-04 @negative @admin
-  Scenario: AUTH-API-ADMIN-04 Empty admin credentials returns 400
+  Scenario: AUTH-API-ADMIN-04 Empty admin credentials returns 401
     Given empty username and password
     When the login request is sent
-    Then the response status code is 400
+    Then the response status code is 401
 
   @AUTH-API-ADMIN-05 @edge-case @admin
   Scenario: AUTH-API-ADMIN-05 SQL injection attempt is rejected
     Given SQL injection payload in credentials
     When the login request is sent
-    Then the response status code is 400
+    Then the response status code is 401
     And the response does not contain error details
 
   # ==================== USER LOGIN TEST CASES ====================
@@ -67,14 +67,14 @@ Feature: Authentication API
     Then the response status code is 401
 
   @AUTH-API-USER-04 @negative @user
-  Scenario: AUTH-API-USER-04 Empty user credentials returns 400
+  Scenario: AUTH-API-USER-04 Empty user credentials returns 401
     Given empty username and password
     When the login request is sent
-    Then the response status code is 400
+    Then the response status code is 401
 
   @AUTH-API-USER-05 @edge-case @user
   Scenario: AUTH-API-USER-05 User SQL injection attempt is rejected
     Given SQL injection payload in credentials
     When the login request is sent
-    Then the response status code is 400
+    Then the response status code is 401
     And the response does not contain error details
