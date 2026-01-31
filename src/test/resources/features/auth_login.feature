@@ -7,7 +7,7 @@ Feature: Authentication API
   Background:
     Given the authentication service is available
 
-  # ==================== ADMIN LOGIN TEST CASES ====================
+  # ==================== ADMIN LOGIN TEST CASES (AUTH-API-ADMIN-01 to 09) ====================
 
   @AUTH-API-ADMIN-01 @positive @admin
   Scenario: AUTH-API-ADMIN-01 Valid admin login returns token
@@ -31,19 +31,45 @@ Feature: Authentication API
     Then the response status code is 401
 
   @AUTH-API-ADMIN-04 @negative @admin
-  Scenario: AUTH-API-ADMIN-04 Empty admin credentials returns 401
+  Scenario: AUTH-API-ADMIN-04 Empty username with valid password returns 401
+    Given empty username with valid admin password
+    When the login request is sent
+    Then the response status code is 401
+
+  @AUTH-API-ADMIN-05 @negative @admin
+  Scenario: AUTH-API-ADMIN-05 Valid username with empty password returns 401
+    Given valid admin username with empty password
+    When the login request is sent
+    Then the response status code is 401
+
+  @AUTH-API-ADMIN-06 @negative @admin
+  Scenario: AUTH-API-ADMIN-06 Empty username and password returns 401
     Given empty username and password
     When the login request is sent
     Then the response status code is 401
 
-  @AUTH-API-ADMIN-05 @edge-case @admin
-  Scenario: AUTH-API-ADMIN-05 SQL injection attempt is rejected
-    Given SQL injection payload in credentials
+  @AUTH-API-ADMIN-07 @edge-case @admin
+  Scenario: AUTH-API-ADMIN-07 SQL injection in username is rejected
+    Given SQL injection payload in username
     When the login request is sent
     Then the response status code is 401
     And the response does not contain error details
 
-  # ==================== USER LOGIN TEST CASES ====================
+  @AUTH-API-ADMIN-08 @edge-case @admin
+  Scenario: AUTH-API-ADMIN-08 SQL injection in password is rejected
+    Given SQL injection payload in password
+    When the login request is sent
+    Then the response status code is 401
+    And the response does not contain error details
+
+  @AUTH-API-ADMIN-09 @edge-case @admin
+  Scenario: AUTH-API-ADMIN-09 XSS injection attempt is rejected
+    Given XSS payload in credentials
+    When the login request is sent
+    Then the response status code is 401
+    And the response does not contain script tags
+
+  # ==================== USER LOGIN TEST CASES (AUTH-API-USER-01 to 09) ====================
 
   @AUTH-API-USER-01 @positive @user
   Scenario: AUTH-API-USER-01 Valid user login returns token
@@ -67,14 +93,41 @@ Feature: Authentication API
     Then the response status code is 401
 
   @AUTH-API-USER-04 @negative @user
-  Scenario: AUTH-API-USER-04 Empty user credentials returns 401
+  Scenario: AUTH-API-USER-04 Empty username with valid password returns 401
+    Given empty username with valid user password
+    When the login request is sent
+    Then the response status code is 401
+
+  @AUTH-API-USER-05 @negative @user
+  Scenario: AUTH-API-USER-05 Valid username with empty password returns 401
+    Given valid user username with empty password
+    When the login request is sent
+    Then the response status code is 401
+
+  @AUTH-API-USER-06 @negative @user
+  Scenario: AUTH-API-USER-06 Empty username and password returns 401
     Given empty username and password
     When the login request is sent
     Then the response status code is 401
 
-  @AUTH-API-USER-05 @edge-case @user
-  Scenario: AUTH-API-USER-05 User SQL injection attempt is rejected
-    Given SQL injection payload in credentials
+  @AUTH-API-USER-07 @edge-case @user
+  Scenario: AUTH-API-USER-07 SQL injection in username is rejected
+    Given SQL injection payload in username
     When the login request is sent
     Then the response status code is 401
     And the response does not contain error details
+
+  @AUTH-API-USER-08 @edge-case @user
+  Scenario: AUTH-API-USER-08 SQL injection in password is rejected
+    Given SQL injection payload in password
+    When the login request is sent
+    Then the response status code is 401
+    And the response does not contain error details
+
+  @AUTH-API-USER-09 @edge-case @user
+  Scenario: AUTH-API-USER-09 XSS injection attempt is rejected
+    Given XSS payload in credentials
+    When the login request is sent
+    Then the response status code is 401
+    And the response does not contain script tags
+
