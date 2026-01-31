@@ -65,10 +65,52 @@ public class AuthLoginSteps {
         context.setPassword("");
     }
 
+    @Given("empty username with valid admin password")
+    public void emptyUsernameWithValidAdminPassword() {
+        context.setUsername("");
+        context.setPassword("admin123");
+    }
+
+    @Given("valid admin username with empty password")
+    public void validAdminUsernameWithEmptyPassword() {
+        context.setUsername("admin");
+        context.setPassword("");
+    }
+
+    @Given("empty username with valid user password")
+    public void emptyUsernameWithValidUserPassword() {
+        context.setUsername("");
+        context.setPassword("test123");
+    }
+
+    @Given("valid user username with empty password")
+    public void validUserUsernameWithEmptyPassword() {
+        context.setUsername("testuser");
+        context.setPassword("");
+    }
+
     @Given("SQL injection payload in credentials")
     public void sqlInjectionPayloadInCredentials() {
         context.setUsername("admin' OR '1'='1");
         context.setPassword("' OR '1'='1");
+    }
+
+    @Given("SQL injection payload in username")
+    public void sqlInjectionPayloadInUsername() {
+        context.setUsername("admin' OR '1'='1' --");
+        context.setPassword("admin123");
+    }
+
+    @Given("SQL injection payload in password")
+    public void sqlInjectionPayloadInPassword() {
+        context.setUsername("admin");
+        context.setPassword("' OR '1'='1' --");
+    }
+
+    @Given("XSS payload in credentials")
+    public void xssPayloadInCredentials() {
+        context.setUsername("<script>alert('xss')</script>");
+        context.setPassword("<script>alert('xss')</script>");
     }
 
     @When("the login request is sent")
@@ -124,5 +166,12 @@ public class AuthLoginSteps {
         assertFalse(responseBody.contains("stack trace"), "Response should not contain stack trace");
         assertFalse(responseBody.toLowerCase().contains("database"), "Response should not contain database details");
         assertFalse(responseBody.toLowerCase().contains("exception"), "Response should not contain exception details");
+    }
+
+    @Then("the response does not contain script tags")
+    public void theResponseDoesNotContainScriptTags() {
+        String responseBody = context.getResponse().getBody().asString();
+        assertFalse(responseBody.toLowerCase().contains("<script>"), "Response should not contain script tags");
+        assertFalse(responseBody.toLowerCase().contains("</script>"), "Response should not contain script closing tags");
     }
 }
