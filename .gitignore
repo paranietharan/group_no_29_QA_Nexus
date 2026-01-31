@@ -25,7 +25,6 @@ Thumbs.db
 /cucumber-report*
 /cucumber-report/
 *.html
-*.xml
 /surefire-reports/
 
 # Misc
