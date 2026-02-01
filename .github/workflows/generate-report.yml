@@ -8,9 +8,14 @@ on:
         required: false
         default: 'ghcr.io/paranietharan/is4600-itqa-app:latest'
       test_tags:
-        description: 'Cucumber tags to run (e.g., @auth, @ui, @smoke)'
+        description: 'Cucumber tags to run (e.g., @auth, @ui, @smoke, or leave empty for all)'
         required: false
         default: '@auth'
+      run_all_tests:
+        description: 'Run all test cases (ignores test_tags)'
+        required: false
+        default: false
+        type: boolean
       headless:
         description: 'Run browser in headless mode'
         required: false
@@ -68,6 +73,13 @@ jobs:
           timeout.page.load=30
           EOF
 
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Pull Docker image
         run: |
           docker pull ${{ inputs.docker_image }}
@@ -99,10 +111,23 @@ jobs:
 
       - name: Run tests
         run: |
-          if [ "${{ inputs.test_tags }}" != "" ]; then
+          if [ "${{ inputs.run_all_tests }}" == "true" ]; then
+            echo "Running ALL tests..."
+            mvn clean test -B -DtestFailureIgnore=true
+          elif [ "${{ inputs.test_tags }}" != "" ]; then
+            echo "Running tests with tags: ${{ inputs.test_tags }}"
             mvn clean test -B -Dcucumber.filter.tags="${{ inputs.test_tags }}" -DtestFailureIgnore=true
           else
+            echo "Running all tests (no tags specified)..."
             mvn clean test -B -DtestFailureIgnore=true
+          fi
+          
+          echo "Test execution completed. Checking results..."
+          if [ -f "target/cucumber-report.json" ]; then
+            echo "✅ cucumber-report.json generated"
+            ls -lh target/cucumber-report.json
+          else
+            echo "❌ cucumber-report.json NOT found"
           fi
 
       - name: Generate Cucumber Report
@@ -115,28 +140,57 @@ jobs:
         run: |
           echo "# 📊 Test Report Summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
-          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
           
           if [ -f "target/cucumber-report.json" ]; then
-            PASSED=$(grep -o '"status": "passed"' target/cucumber-report.json | wc -l)
-            FAILED=$(grep -o '"status": "failed"' target/cucumber-report.json | wc -l)
-            SKIPPED=$(grep -o '"status": "skipped"' target/cucumber-report.json | wc -l)
-            
-            echo "| ✅ Passed | $PASSED |" >> $GITHUB_STEP_SUMMARY
-            echo "| ❌ Failed | $FAILED |" >> $GITHUB_STEP_SUMMARY
-            echo "| ⏭️ Skipped | $SKIPPED |" >> $GITHUB_STEP_SUMMARY
+            echo "Parsing Cucumber JSON report..."
+          
+            # Count step statuses from Cucumber JSON (format: "status":"passed")
+            PASSED=$(grep -o '"status":"passed"' target/cucumber-report.json | wc -l)
+            FAILED=$(grep -o '"status":"failed"' target/cucumber-report.json | wc -l)
+            SKIPPED=$(grep -o '"status":"skipped"' target/cucumber-report.json | wc -l)
+          
+            # Count scenarios
+            SCENARIOS=$(grep -o '"type":"scenario"' target/cucumber-report.json | wc -l)
+          
+            TOTAL_STEPS=$((PASSED + FAILED + SKIPPED))
+          
+            echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+            echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+            echo "| 📋 Scenarios | $SCENARIOS |" >> $GITHUB_STEP_SUMMARY
+            echo "| ✅ Passed Steps | $PASSED |" >> $GITHUB_STEP_SUMMARY
+            echo "| ❌ Failed Steps | $FAILED |" >> $GITHUB_STEP_SUMMARY
+            echo "| ⏭️ Skipped Steps | $SKIPPED |" >> $GITHUB_STEP_SUMMARY
+            echo "| 📊 Total Steps | $TOTAL_STEPS |" >> $GITHUB_STEP_SUMMARY
           else
-            echo "| ℹ️ Status | No JSON report generated |" >> $GITHUB_STEP_SUMMARY
+            echo "| ⚠️ Status | No cucumber-report.json found |" >> $GITHUB_STEP_SUMMARY
           fi
           
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "## 📝 Generated Reports" >> $GITHUB_STEP_SUMMARY
+          echo "## 📁 Files Generated" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "✅ Reports available in artifacts:" >> $GITHUB_STEP_SUMMARY
-          echo "- `cucumber-report.json` - Machine readable format" >> $GITHUB_STEP_SUMMARY
-          echo "- `cucumber-report.html` - Browser viewable report" >> $GITHUB_STEP_SUMMARY
-          echo "- `cucumber-advanced-report/` - Advanced HTML report" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "target/cucumber-report.json" ]; then
+            FILE_SIZE=$(du -h target/cucumber-report.json | cut -f1)
+            echo "- ✅ cucumber-report.json ($FILE_SIZE)" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ -f "target/cucumber-report.html" ]; then
+            FILE_SIZE=$(du -h target/cucumber-report.html | cut -f1)
+            echo "- ✅ cucumber-report.html ($FILE_SIZE)" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ -d "target/cucumber-advanced-report" ]; then
+            echo "- ✅ cucumber-advanced-report/ directory" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ -d "target/surefire-reports" ]; then
+            FILE_COUNT=$(ls target/surefire-reports/*.xml 2>/dev/null | wc -l)
+            echo "- ✅ surefire-reports/ ($FILE_COUNT XML files)" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📝 Download Reports" >> $GITHUB_STEP_SUMMARY
+          echo "Reports available in **Artifacts** section below." >> $GITHUB_STEP_SUMMARY
 
       - name: Upload JSON Report
         if: always()
@@ -184,7 +238,7 @@ jobs:
             - cucumber-html-report
             - cucumber-advanced-report
             - surefire-reports
-            Configuration: ${{ inputs.docker_image }} | Tags: ${{ inputs.test_tags }} | Headless: ${{ inputs.headless }}`;
+            Configuration: ${{ inputs.docker_image }} | Tags: ${{ inputs.test_tags }} | Run All: ${{ inputs.run_all_tests }} | Headless: ${{ inputs.headless }}`;
             
             if (prNumber) {
               github.rest.issues.createComment({
@@ -202,20 +256,54 @@ jobs:
           echo "TEST EXECUTION COMPLETED"
           echo "=================================================="
           echo ""
-          echo "Docker Image: ${{ inputs.docker_image }}"
-          echo "Test Tags: ${{ inputs.test_tags }}"
+          echo "Configuration:"
+          echo "  Docker Image: ${{ inputs.docker_image }}"
+          echo "  Test Tags: ${{ inputs.test_tags }}"
+          echo "  Run All Tests: ${{ inputs.run_all_tests }}"
+          echo "  Headless: ${{ inputs.headless }}"
           echo ""
+          echo "Reports Generated:"
+          
           if [ -f "target/cucumber-report.json" ]; then
-            echo "✅ Cucumber JSON report generated"
+            SIZE=$(du -h target/cucumber-report.json | cut -f1)
+            echo "  ✅ cucumber-report.json ($SIZE)"
+          
+            # Quick test summary from Cucumber JSON
+            PASSED=$(grep -o '"status":"passed"' target/cucumber-report.json | wc -l)
+            FAILED=$(grep -o '"status":"failed"' target/cucumber-report.json | wc -l)
+            SCENARIOS=$(grep -o '"type":"scenario"' target/cucumber-report.json | wc -l)
+          
+            echo ""
+            echo "Quick Test Summary:"
+            echo "  Scenarios: $SCENARIOS"
+            echo "  Passed Steps: $PASSED"
+            echo "  Failed Steps: $FAILED"
+          else
+            echo "  ❌ cucumber-report.json (NOT FOUND)"
           fi
+          
           if [ -f "target/cucumber-report.html" ]; then
-            echo "✅ Cucumber HTML report generated"
+            SIZE=$(du -h target/cucumber-report.html | cut -f1)
+            echo "  ✅ cucumber-report.html ($SIZE)"
+          else
+            echo "  ❌ cucumber-report.html (NOT FOUND)"
           fi
+          
           if [ -d "target/cucumber-advanced-report" ]; then
-            echo "✅ Advanced Cucumber report generated"
+            echo "  ✅ cucumber-advanced-report/ directory"
+          else
+            echo "  ❌ cucumber-advanced-report/ (NOT FOUND)"
           fi
+          
+          if [ -d "target/surefire-reports" ]; then
+            XML_COUNT=$(ls target/surefire-reports/*.xml 2>/dev/null | wc -l)
+            echo "  ✅ surefire-reports/ ($XML_COUNT XML files)"
+          else
+            echo "  ❌ surefire-reports/ (NOT FOUND)"
+          fi
+          
           echo ""
-          echo "Download artifacts to view reports locally"
+          echo "📦 Download artifacts from the Actions tab to view reports"
           echo "=================================================="
 
       - name: Cleanup
