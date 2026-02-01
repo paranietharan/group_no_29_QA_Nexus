@@ -1,0 +1,225 @@
+name: Generate Test Report
+
+on:
+  workflow_dispatch:
+    inputs:
+      docker_image:
+        description: 'Docker image to test (default: latest)'
+        required: false
+        default: 'ghcr.io/paranietharan/is4600-itqa-app:latest'
+      test_tags:
+        description: 'Cucumber tags to run (e.g., @auth, @ui, @smoke)'
+        required: false
+        default: '@auth'
+      headless:
+        description: 'Run browser in headless mode'
+        required: false
+        default: true
+        type: boolean
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: qa_training
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '25'
+          cache: 'maven'
+
+      - name: Set up Chrome
+        uses: browser-actions/setup-chrome@v1
+
+      - name: Set up ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
+
+      - name: Configure test properties
+        run: |
+          cat > src/test/resources/config.properties << EOF
+          api.baseUrl=http://localhost:8080
+          api.auth.loginPath=/api/auth/login
+          ui.baseUrl=http://localhost:8080
+          ui.loginPath=/ui/login
+          browser=chrome
+          browser.headless=${{ inputs.headless }}
+          browser.window.width=1920
+          browser.window.height=1080
+          timeout.implicit=10
+          timeout.explicit=10
+          timeout.page.load=30
+          EOF
+
+      - name: Pull Docker image
+        run: |
+          docker pull ${{ inputs.docker_image }}
+          echo "Docker image pulled successfully"
+          docker images
+
+      - name: Start application container
+        run: |
+          docker run -d \
+            --name qa-training-app \
+            --network host \
+            -e SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/qa_training?useSSL=false\&allowPublicKeyRetrieval=true \
+            -e SPRING_DATASOURCE_USERNAME=root \
+            -e SPRING_DATASOURCE_PASSWORD=root \
+            -e SPRING_JPA_HIBERNATE_DDL_AUTO=update \
+            ${{ inputs.docker_image }}
+          
+          echo "Waiting for application to start..."
+          sleep 40
+          
+          for i in {1..15}; do
+            if curl -sf http://localhost:8080 > /dev/null 2>&1; then
+              echo "✅ Application is running"
+              break
+            fi
+            echo "Attempt $i/15 - waiting for app..."
+            sleep 4
+          done
+
+      - name: Run tests
+        run: |
+          if [ "${{ inputs.test_tags }}" != "" ]; then
+            mvn clean test -B -Dcucumber.filter.tags="${{ inputs.test_tags }}" -DtestFailureIgnore=true
+          else
+            mvn clean test -B -DtestFailureIgnore=true
+          fi
+
+      - name: Generate Cucumber Report
+        if: always()
+        run: |
+          mvn exec:java@report -B 2>/dev/null || true
+
+      - name: Create report summary
+        if: always()
+        run: |
+          echo "# 📊 Test Report Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          
+          if [ -f "target/cucumber-report.json" ]; then
+            PASSED=$(grep -o '"status": "passed"' target/cucumber-report.json | wc -l)
+            FAILED=$(grep -o '"status": "failed"' target/cucumber-report.json | wc -l)
+            SKIPPED=$(grep -o '"status": "skipped"' target/cucumber-report.json | wc -l)
+            
+            echo "| ✅ Passed | $PASSED |" >> $GITHUB_STEP_SUMMARY
+            echo "| ❌ Failed | $FAILED |" >> $GITHUB_STEP_SUMMARY
+            echo "| ⏭️ Skipped | $SKIPPED |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| ℹ️ Status | No JSON report generated |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## 📝 Generated Reports" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ Reports available in artifacts:" >> $GITHUB_STEP_SUMMARY
+          echo "- `cucumber-report.json` - Machine readable format" >> $GITHUB_STEP_SUMMARY
+          echo "- `cucumber-report.html` - Browser viewable report" >> $GITHUB_STEP_SUMMARY
+          echo "- `cucumber-advanced-report/` - Advanced HTML report" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload JSON Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-json-report
+          path: target/cucumber-report.json
+          retention-days: 30
+
+      - name: Upload HTML Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-html-report
+          path: target/cucumber-report.html
+          retention-days: 30
+
+      - name: Upload Advanced Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cucumber-advanced-report
+          path: target/cucumber-advanced-report/
+          retention-days: 30
+
+      - name: Upload Surefire Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-reports
+          path: target/surefire-reports/
+          retention-days: 30
+
+      - name: Comment on PR with Report Links
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const runId = context.runId;
+            const prNumber = context.payload.pull_request?.number;
+            
+            const comment = `Test Report Generated - Run: #${runId}
+            Reports available in Artifacts:
+            - cucumber-json-report
+            - cucumber-html-report
+            - cucumber-advanced-report
+            - surefire-reports
+            Configuration: ${{ inputs.docker_image }} | Tags: ${{ inputs.test_tags }} | Headless: ${{ inputs.headless }}`;
+            
+            if (prNumber) {
+              github.rest.issues.createComment({
+                issue_number: prNumber,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
+
+      - name: Display test results
+        if: always()
+        run: |
+          echo "=================================================="
+          echo "TEST EXECUTION COMPLETED"
+          echo "=================================================="
+          echo ""
+          echo "Docker Image: ${{ inputs.docker_image }}"
+          echo "Test Tags: ${{ inputs.test_tags }}"
+          echo ""
+          if [ -f "target/cucumber-report.json" ]; then
+            echo "✅ Cucumber JSON report generated"
+          fi
+          if [ -f "target/cucumber-report.html" ]; then
+            echo "✅ Cucumber HTML report generated"
+          fi
+          if [ -d "target/cucumber-advanced-report" ]; then
+            echo "✅ Advanced Cucumber report generated"
+          fi
+          echo ""
+          echo "Download artifacts to view reports locally"
+          echo "=================================================="
+
+      - name: Cleanup
+        if: always()
+        run: |
+          docker stop qa-training-app 2>/dev/null || true
+          docker rm qa-training-app 2>/dev/null || true
