@@ -8,9 +8,14 @@ on:
         required: false
         default: 'ghcr.io/paranietharan/is4600-itqa-app:latest'
       test_tags:
-        description: 'Cucumber tags to run (e.g., @auth, @ui, @smoke)'
+        description: 'Cucumber tags to run (e.g., @auth, @ui, @smoke, or leave empty for all)'
         required: false
         default: '@auth'
+      run_all_tests:
+        description: 'Run all test cases (ignores test_tags)'
+        required: false
+        default: false
+        type: boolean
       headless:
         description: 'Run browser in headless mode'
         required: false
@@ -68,6 +73,13 @@ jobs:
           timeout.page.load=30
           EOF
 
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Pull Docker image
         run: |
           docker pull ${{ inputs.docker_image }}
@@ -99,9 +111,14 @@ jobs:
 
       - name: Run tests
         run: |
-          if [ "${{ inputs.test_tags }}" != "" ]; then
+          if [ "${{ inputs.run_all_tests }}" == "true" ]; then
+            echo "Running ALL tests..."
+            mvn clean test -B -DtestFailureIgnore=true
+          elif [ "${{ inputs.test_tags }}" != "" ]; then
+            echo "Running tests with tags: ${{ inputs.test_tags }}"
             mvn clean test -B -Dcucumber.filter.tags="${{ inputs.test_tags }}" -DtestFailureIgnore=true
           else
+            echo "Running all tests (no tags specified)..."
             mvn clean test -B -DtestFailureIgnore=true
           fi
 
@@ -184,7 +201,7 @@ jobs:
             - cucumber-html-report
             - cucumber-advanced-report
             - surefire-reports
-            Configuration: ${{ inputs.docker_image }} | Tags: ${{ inputs.test_tags }} | Headless: ${{ inputs.headless }}`;
+            Configuration: ${{ inputs.docker_image }} | Tags: ${{ inputs.test_tags }} | Run All: ${{ inputs.run_all_tests }} | Headless: ${{ inputs.headless }}`;
             
             if (prNumber) {
               github.rest.issues.createComment({
