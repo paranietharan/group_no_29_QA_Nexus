@@ -57,6 +57,18 @@ jobs:
           timeout.page.load=30
           EOF
 
+      - name: Verify JAR file exists
+        run: |
+          if [ -f "application/qa-training-app.jar" ]; then
+            echo "✅ JAR file found"
+            ls -la application/
+          else
+            echo "❌ JAR file not found at application/qa-training-app.jar"
+            echo "Available files:"
+            find . -name "*.jar" 2>/dev/null || echo "No JAR files found"
+            exit 1
+          fi
+
       - name: Start Backend Application
         run: |
           java -jar application/qa-training-app.jar \

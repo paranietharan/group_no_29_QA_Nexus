@@ -1,12 +1,14 @@
 # Java
 *.class
-*.jar
 *.war
 *.ear
 
 # Maven
 /target/
 !.mvn/wrapper/maven-wrapper.jar
+
+# Application JAR (allow)
+!application/*.jar
 
 # IntelliJ IDEA
 .idea/
