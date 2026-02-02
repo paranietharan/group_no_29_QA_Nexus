@@ -5,5 +5,3 @@ Feature: Sales - User UI
     Given I login to the application as "USER"
     When I click the Sales menu from sidebar
     Then Sales page should load and URL should contain "/ui/sales"
-
-
