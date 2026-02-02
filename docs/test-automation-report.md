@@ -24,7 +24,7 @@ mvn test "-Dcucumber.features=src/test/resources/features/auth_login.feature"
 
 # Run a single scenario by tag (example: @AUTH-API-ADMIN-01 @positive @admin Login with valid admin credentials)
 ```powershell
-mvn test "-Dcucumber.filter.tags=@AUTH-API-ADMIN-01"
+mvn clean test "-Dcucumber.filter.name=.*Valid admin login returns token.*"
 ```
 
 # Run by tag (examples)
