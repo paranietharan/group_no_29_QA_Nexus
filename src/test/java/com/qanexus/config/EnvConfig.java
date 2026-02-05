@@ -97,4 +97,9 @@ public final class EnvConfig {
     private String toEnvKey(String key) {
         return key.toUpperCase().replace('.', '_');
     }
+
+    public String getSalesPath() {
+    return get("api.sales.path", "/api/sales");
+}
+
 }
