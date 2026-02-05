@@ -2,6 +2,7 @@ package com.qanexus.steps;
 
 import com.qanexus.api.ApiClient;
 import com.qanexus.support.TestContext;
+import com.qanexus.support.TestDataLoader;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
@@ -140,6 +141,15 @@ public class MayuravelApiSteps {
     @When("user sends GET request to plant summary endpoint")
     public void userSendsGetRequestToPlantSummaryEndpoint() {
         response = apiClient.getWithAuth("/api/plants/summary", context.getToken());
+        context.setResponse(response);
+    }
+
+    @When("user sends GET request to plants endpoint with sort {string}")
+    public void userSendsGetRequestToPlantsEndpointWithSort(String sortParam) {
+        Map<String, String> params = new HashMap<>();
+        params.put("sort", sortParam);
+        
+        response = apiClient.getWithAuth("/api/plants", context.getToken(), params);
         context.setResponse(response);
     }
 
@@ -325,9 +335,12 @@ public class MayuravelApiSteps {
     @Given("user is authenticated")
     public void userIsAuthenticated() {
         logger.info("Authenticating regular user");
-        Map<String, String> credentials = new HashMap<>();
-        credentials.put("username", "user");
-        credentials.put("password", "user123");
+        Map<String, String> credentials = TestDataLoader.loadJsonMap("testdata/auth_user_login_valid.json");
+        
+        String username = credentials.get("username");
+        String password = credentials.get("password");
+        
+        logger.info("User authentication attempt - username: {}", username);
         
         // Try multiple authentication endpoints
         String[] authEndpoints = {

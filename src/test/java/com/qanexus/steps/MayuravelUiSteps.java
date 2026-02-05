@@ -897,6 +897,14 @@ public class MayuravelUiSteps {
         }
     }
 
+    @Then("the page loads correctly with paginated data")
+    public void thePageLoadsCorrectlyWithPaginatedData() {
+        boolean isPageDisplayed = modulePage.isPageDisplayed();
+        logger.info("User - Paginated page displayed: {}", isPageDisplayed);
+        
+        Assertions.assertTrue(isPageDisplayed, "Page should load correctly with paginated data");
+    }
+
     // ==================== USER UI - LOADING STATES ====================
     
     @When("user performs a data fetch operation")
