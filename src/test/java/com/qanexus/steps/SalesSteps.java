@@ -16,10 +16,22 @@ import java.util.ArrayList;
 import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
+
+
+
+
 public class SalesSteps {
+private String targetRowSignature;
+private int salesCountBeforeCancel;
 
     private SalesPage salesPage;
     private final EnvConfig config = EnvConfig.getInstance();
+private int salesCountBeforeDelete;
+private String firstRowBeforeDelete;
+private String selectedPlantName;
+private int stockBefore;
+private int stockAfter;
+private int qtySold;
 
 // =========================================================
     // Common Step: Login (Used for ALL test cases)
@@ -367,6 +379,238 @@ public void validationErrorShouldBeDisplayedForQuantityGreaterThanStock() {
             "Expected validation for quantity > stock, but none found. " +
                     "HTML5 msg: " + html5Msg + ", inlineError: " + inlineError + ", submitBlocked: " + submitBlocked
     );
+}
+
+
+
+// ===== ADMIN TC05: Delete sale with confirmation =====
+@When("I click Delete on any sale record")
+public void iClickDeleteOnAnySaleRecord() {
+    WebDriver driver = DriverFactory.getDriver();
+    salesPage = new SalesPage(driver);
+
+    assertTrue(salesPage.hasSalesRecords(),
+            "Precondition failed: Sales records should exist for TC_UI_SALES_ADMIN_05");
+
+    salesCountBeforeDelete = salesPage.getSalesRowCount();
+
+    // ✅ capture signature from page method (returned)
+    targetRowSignature = salesPage.clickDeleteOnAnyRowAndGetSignature();
+
+    salesPage.waitForConfirmationPrompt(); // your existing wait method
+}
+
+
+@Then("Confirmation dialog should be displayed")
+public void confirmationDialogShouldBeDisplayed() {
+    WebDriver driver = DriverFactory.getDriver();
+    salesPage = new SalesPage(driver);
+
+    assertTrue(salesPage.isConfirmationDialogVisible(),
+            "Confirmation dialog/alert should be displayed after clicking Delete");
+
+    // Optional: validate message if JS alert
+    String alertText = salesPage.getAlertTextIfPresent();
+    if (!alertText.isBlank()) {
+        assertTrue(alertText.toLowerCase().contains("are you sure")
+                        || alertText.toLowerCase().contains("delete"),
+                "Unexpected confirmation alert text: " + alertText);
+    }
+}
+
+@Then("Sale record should not be deleted before confirmation")
+public void saleRecordShouldNotBeDeletedBeforeConfirmation() {
+
+    assertNotNull(targetRowSignature, "Target row signature is null");
+    assertFalse(targetRowSignature.isBlank(), "Target row signature was not captured");
+
+    salesPage.cancelDeletionIfPromptPresent(); // dismiss alert/modal
+
+    // ✅ should still exist after cancel
+    assertTrue(salesPage.isRowSignaturePresent(targetRowSignature),
+            "Row should still exist after cancelling confirmation.");
+}
+
+
+@When("I confirm the deletion")
+public void iConfirmTheDeletion() {
+    WebDriver driver = DriverFactory.getDriver();
+    salesPage = new SalesPage(driver);
+
+    // Click delete again (after cancel step), and capture the signature again
+    targetRowSignature = salesPage.clickDeleteOnAnyRowAndGetSignature();
+    salesPage.waitForConfirmationPrompt();
+
+    salesPage.confirmDeletion();
+}
+
+
+@Then("Sale record should be removed after confirmation")
+public void saleRecordShouldBeRemovedAfterConfirmation() {
+    WebDriver driver = DriverFactory.getDriver();
+    salesPage = new SalesPage(driver);
+
+    assertNotNull(targetRowSignature, "Target row signature is null");
+    assertFalse(targetRowSignature.isBlank(), "Target row signature was not captured.");
+
+    new org.openqa.selenium.support.ui.WebDriverWait(driver, java.time.Duration.ofSeconds(12))
+            .until(d -> !salesPage.isRowSignaturePresent(targetRowSignature));
+
+    assertFalse(salesPage.isRowSignaturePresent(targetRowSignature),
+            "Deleted sale record is still present after confirmation.");
+}
+
+
+
+
+@Then("Sales records should be sorted by Sold Date in descending order for ADMIN")
+public void salesRecordsShouldBeSortedBySoldDateInDescendingOrderForAdmin() {
+    salesRecordsShouldBeSortedBySoldDateInDescendingOrder(); // reuse same logic
+}
+
+
+// ===== ADMIN TC07: No sales message display =====
+
+@Then("No sales found message should be displayed for ADMIN")
+public void noSalesFoundMessageShouldBeDisplayedForAdmin() {
+    WebDriver driver = DriverFactory.getDriver();
+    salesPage = new SalesPage(driver);
+
+    // Wait page load: either rows exist OR message appears
+    new org.openqa.selenium.support.ui.WebDriverWait(driver, java.time.Duration.ofSeconds(8))
+            .until(d -> salesPage.hasSalesRecords() || salesPage.isNoSalesFoundMessageVisible());
+
+    // Precondition for TC07
+    if (salesPage.hasSalesRecords()) {
+        fail("TC_UI_SALES_ADMIN_07 precondition failed: sales records exist. " +
+                "Clear sales data in DB (or use API cleanup) and re-run this test.");
+    }
+
+    // Validate empty-state message
+    assertTrue(salesPage.isNoSalesFoundMessageVisible(),
+            "\"No sales found\" message should appear when no sales exist for ADMIN");
+
+    // Optional check (recommended)
+    assertTrue(salesPage.areSalesTableHeadersVisible(),
+            "Sales table headers should still be visible in empty state");
+}
+
+// ===== ADMIN TC08: Cancel Sell Plant form =====
+
+@When("I open the Sell Plant form")
+public void iOpenTheSellPlantForm() {
+    WebDriver driver = DriverFactory.getDriver();
+    salesPage = new SalesPage(driver);
+
+    // ✅ capture BEFORE opening the form
+    new org.openqa.selenium.support.ui.WebDriverWait(driver, java.time.Duration.ofSeconds(8))
+            .until(d -> salesPage.hasSalesRecords() || salesPage.isNoSalesFoundMessageVisible());
+
+    salesCountBeforeCancel = salesPage.getSalesRowCount();
+
+    // open form
+    salesPage.clickSellPlantButton();
+
+    // wait form visible
+    new org.openqa.selenium.support.ui.WebDriverWait(driver, java.time.Duration.ofSeconds(8))
+            .until(d -> salesPage.isSellPlantFormVisible());
+}
+
+
+@When("I click Cancel in Sell Plant form")
+public void iClickCancelInSellPlantForm() {
+    WebDriver driver = DriverFactory.getDriver();
+    salesPage = new SalesPage(driver);
+
+    salesPage.clickCancelButton();
+}
+
+@Then("Admin should be redirected back to Sales list page without saving sale")
+public void adminShouldBeRedirectedBackToSalesListPageWithoutSavingSale() {
+    WebDriver driver = DriverFactory.getDriver();
+    salesPage = new SalesPage(driver);
+
+    // wait until Sales list URL
+    new org.openqa.selenium.support.ui.WebDriverWait(driver, java.time.Duration.ofSeconds(8))
+            .until(d -> driver.getCurrentUrl().contains("/ui/sales"));
+
+    assertTrue(driver.getCurrentUrl().contains("/ui/sales"),
+            "Admin should be redirected back to Sales list page");
+
+    // form should be closed
+    new org.openqa.selenium.support.ui.WebDriverWait(driver, java.time.Duration.ofSeconds(8))
+            .until(d -> !salesPage.isSellPlantFormVisible());
+
+    assertFalse(salesPage.isSellPlantFormVisible(),
+            "Sell Plant form should be closed after clicking Cancel");
+
+    // ✅ count must remain same
+    new org.openqa.selenium.support.ui.WebDriverWait(driver, java.time.Duration.ofSeconds(8))
+            .until(d -> salesPage.getSalesRowCount() == salesCountBeforeCancel);
+
+    int afterCount = salesPage.getSalesRowCount();
+    assertEquals(salesCountBeforeCancel, afterCount,
+            "No new sale should be created after clicking Cancel");
+}
+
+
+// =========================================================
+// TC_UI_SALES_ADMIN_09 Stock update after sale
+// =========================================================
+
+@When("I sell a plant using the Sell Plant form and note stock change")
+public void iSellAPlantUsingSellPlantFormAndNoteStockChange() {
+    WebDriver driver = DriverFactory.getDriver();
+    salesPage = new SalesPage(driver);
+
+    // Go to sales list (precondition already satisfied by previous step in feature)
+    // Open Sell Plant form
+    salesPage.clickSellPlantButton();
+    salesPage.waitForSellPlantForm();
+
+    // Select a plant + capture stockBefore
+    String optionText = salesPage.selectFirstPlantAndReturnVisibleText();
+    selectedPlantName = salesPage.normalizePlantName(optionText);
+    stockBefore = salesPage.extractStockFromOptionText(optionText);
+
+    // If your dropdown does NOT show stock number, this TC cannot be validated via UI dropdown
+    assertTrue(stockBefore >= 0,
+            "Could not read stock from dropdown option text. Option was: " + optionText +
+            ". Update UI to show stock OR validate via Plants page/API.");
+
+    // Sell 1 item (safe minimal change)
+    qtySold = 1;
+    assertTrue(stockBefore >= qtySold,
+            "Not enough stock to run test. stockBefore=" + stockBefore + ", qtySold=" + qtySold);
+
+    salesPage.enterQuantity(String.valueOf(qtySold));
+    salesPage.clickSellPlantSubmit();
+    salesPage.waitForSaleSubmissionToComplete(config.getUiBaseUrl());
+
+    // Open Sell Plant form again and re-check stock for SAME plant
+    // (If redirected to sales list, open again)
+    if (!driver.getCurrentUrl().contains("/ui/sales/new")) {
+        // from /ui/sales list
+        salesPage.clickSellPlantButton();
+        salesPage.waitForSellPlantForm();
+    }
+
+    salesPage.selectPlantByPartialName(selectedPlantName);
+    String afterText = salesPage.getSelectedPlantOptionText();
+    stockAfter = salesPage.extractStockFromOptionText(afterText);
+
+    assertTrue(stockAfter >= 0,
+            "Could not read stockAfter from dropdown. Option was: " + afterText);
+}
+
+@Then("Stock quantity should be reduced by the sold amount")
+public void stockQuantityShouldBeReducedBySoldAmount() {
+    int expected = stockBefore - qtySold;
+
+    assertEquals(expected, stockAfter,
+            "Stock was not reduced correctly. Plant=" + selectedPlantName +
+            ", stockBefore=" + stockBefore + ", qtySold=" + qtySold +
+            ", expectedAfter=" + expected + ", actualAfter=" + stockAfter);
 }
 
 

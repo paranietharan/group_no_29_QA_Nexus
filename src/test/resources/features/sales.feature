@@ -87,3 +87,44 @@ Scenario: TC_UI_SALES_ADMIN_03 Quantity validation against stock
   Then Validation error should be displayed for quantity greater than stock
 
 
+@ui @sales @admin
+Scenario: TC_UI_SALES_ADMIN_05 Delete sale with confirmation
+  Given I login to the application as "ADMIN"
+  When I access the Sales page via direct URL
+  And I click Delete on any sale record
+Then Confirmation dialog should be displayed
+And Sale record should not be deleted before confirmation
+When I confirm the deletion
+Then Sale record should be removed after confirmation
+
+
+
+@ui @sales @admin
+Scenario: TC_UI_SALES_ADMIN_06 Default sorting by sold date
+  Given I login to the application as "ADMIN"
+  When I access the Sales page via direct URL
+  Then Sales records should be sorted by Sold Date in descending order
+
+
+@ui @sales @admin
+Scenario: TC_UI_SALES_ADMIN_07 No sales message display
+  Given I login to the application as "ADMIN"
+  When I access the Sales page via direct URL
+  Then No sales found message should be displayed for ADMIN
+
+
+@ui @sales @admin
+Scenario: TC_UI_SALES_ADMIN_08 Cancel Sell Plant form
+  Given I login to the application as "ADMIN"
+  When I access the Sales page via direct URL
+  When I open the Sell Plant form
+And I click Cancel in Sell Plant form
+Then Admin should be redirected back to Sales list page without saving sale
+
+
+@ui @sales @admin
+Scenario: TC_UI_SALES_ADMIN_09 Stock update after sale
+  Given I login to the application as "ADMIN"
+  When I access the Sales page via direct URL
+  And I sell a plant using the Sell Plant form and note stock change
+  Then Stock quantity should be reduced by the sold amount

@@ -1,33 +1,3 @@
-// package com.qanexus.hooks;
-
-// import com.qanexus.driver.DriverFactory;
-// import io.cucumber.java.After;
-// import io.cucumber.java.Before;
-// import io.cucumber.java.Scenario;
-// import org.openqa.selenium.OutputType;
-// import org.openqa.selenium.TakesScreenshot;
-// import org.openqa.selenium.WebDriver;
-
-// public class UIHooks {
-
-//     @Before("@ui")
-//     public void setUp() {
-//         DriverFactory.getDriver();
-//     }
-
-//     @After("@ui")
-//     public void tearDown(Scenario scenario) {
-//         WebDriver driver = DriverFactory.getDriver();
-//         if (scenario.isFailed() && driver != null) {
-//             byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-//             scenario.attach(screenshot, "image/png", "failure-screenshot");
-//         }
-//         DriverFactory.quitDriver();
-//     }
-// }
-
-
-
 package com.qanexus.hooks;
 
 import com.qanexus.driver.DriverFactory;
@@ -48,16 +18,46 @@ public class UIHooks {
     @After("@ui")
     public void tearDown(Scenario scenario) {
         WebDriver driver = DriverFactory.getDriver();
-
         if (scenario.isFailed() && driver != null) {
             byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
             scenario.attach(screenshot, "image/png", "failure-screenshot");
         }
-
-        // ✅ If keepBrowserOpen=true, DON'T close the browser (useful for debugging)
-        boolean keepBrowserOpen = Boolean.parseBoolean(System.getProperty("keepBrowserOpen", "false"));
-        if (!keepBrowserOpen) {
-            DriverFactory.quitDriver();
-        }
+        DriverFactory.quitDriver();
     }
 }
+
+
+
+// package com.qanexus.hooks;
+
+// import com.qanexus.driver.DriverFactory;
+// import io.cucumber.java.After;
+// import io.cucumber.java.Before;
+// import io.cucumber.java.Scenario;
+// import org.openqa.selenium.OutputType;
+// import org.openqa.selenium.TakesScreenshot;
+// import org.openqa.selenium.WebDriver;
+
+// public class UIHooks {
+
+//     @Before("@ui")
+//     public void setUp() {
+//         DriverFactory.getDriver();
+//     }
+
+//     @After("@ui")
+//     public void tearDown(Scenario scenario) {
+//         WebDriver driver = DriverFactory.getDriver();
+
+//         if (scenario.isFailed() && driver != null) {
+//             byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+//             scenario.attach(screenshot, "image/png", "failure-screenshot");
+//         }
+
+//         // ✅ If keepBrowserOpen=true, DON'T close the browser (useful for debugging)
+//         boolean keepBrowserOpen = Boolean.parseBoolean(System.getProperty("keepBrowserOpen", "false"));
+//         if (!keepBrowserOpen) {
+//             DriverFactory.quitDriver();
+//         }
+//     }
+// }
