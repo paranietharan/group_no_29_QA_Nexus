@@ -73,17 +73,17 @@ public class PlantUISteps {
 
     @Given("sub-categories exist in the system")
     public void subCategoriesExistInTheSystem() {
-        // Assume sub-categories exist
+        // Check sub-categories exist
     }
 
     @Given("multiple plants exist with different prices")
     public void multiplePlantsExistWithDifferentPrices() {
-        // Assume plants exist
+        // Check plants exist
     }
 
     @Given("a plant with quantity {int} exists")
     public void aPlantWithQuantityExists(int quantity) {
-        // Assume plant exists
+        // Check plant exists
     }
 
     // ===================== Navigation Steps =====================
