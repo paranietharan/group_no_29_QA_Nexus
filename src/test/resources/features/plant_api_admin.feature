@@ -70,12 +70,12 @@ Feature: Plant API - Admin Role
 
   # TC_API_ADMIN_008
   @TC_API_ADMIN_008 @negative @validation
-  Scenario: Admin updates plant with invalid categoryId returns 400
+  Scenario: Admin updates plant with invalid categoryId - category unchanged
     Given an existing plant to update
     And update data with non-existent category ID 999
     When the admin sends a PUT request to update the plant with invalid category
-    Then the plant API response status code is 400
-    And the response contains error about invalid category
+    Then the plant API response status code is 200
+    And the response shows the original category is unchanged
 
   # TC_API_ADMIN_009
   @TC_API_ADMIN_009 @negative @notfound

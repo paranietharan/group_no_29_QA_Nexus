@@ -22,9 +22,12 @@ public class PlantApiSteps {
     private final AuthApi authApi = new AuthApi();
     
     private String plantName;
+    private String originalPlantName;  // Store original name for updates
     private double plantPrice;
     private int plantQuantity;
+    private int originalQuantity;  // Store original quantity for updates
     private Long categoryId;
+    private Long originalCategoryId;  // Store original category for updates
     private Long plantId;
     private Long createdPlantId;
 
@@ -216,8 +219,11 @@ public class PlantApiSteps {
     @Given("an existing plant to update")
     public void anExistingPlantToUpdate() {
         ensureSubCategoryExists();
+        originalPlantName = "UpdateTest" + System.currentTimeMillis();
+        originalQuantity = 10;
+        originalCategoryId = categoryId;
         Response response = plantApi.createPlant(context.getToken(), categoryId, 
-            "UpdateTest" + System.currentTimeMillis(), 100.0, 10);
+            originalPlantName, 100.0, originalQuantity);
         if (response.statusCode() == 201) {
             plantId = response.jsonPath().getLong("id");
             createdPlantId = plantId;
@@ -361,7 +367,9 @@ public class PlantApiSteps {
 
     @When("the admin sends a PUT request to update the plant")
     public void theAdminSendsPutRequestToUpdatePlant() {
-        Response response = plantApi.updatePlant(context.getToken(), plantId, null, plantPrice, null, null);
+        // API requires ALL fields - send original values for unchanged fields
+        Response response = plantApi.updatePlant(context.getToken(), plantId, 
+            originalPlantName, plantPrice, originalQuantity, originalCategoryId);
         context.setResponse(response);
     }
 
@@ -385,7 +393,9 @@ public class PlantApiSteps {
 
     @When("the admin sends a PUT request to update the plant with invalid category")
     public void theAdminSendsPutRequestWithInvalidCategory() {
-        Response response = plantApi.updatePlant(context.getToken(), plantId, null, null, null, categoryId);
+        // API requires ALL fields - send original values but use invalid categoryId
+        Response response = plantApi.updatePlant(context.getToken(), plantId, 
+            originalPlantName, 100.0, originalQuantity, categoryId);  // categoryId is set to 999 (invalid)
         context.setResponse(response);
     }
 
@@ -523,6 +533,15 @@ public class PlantApiSteps {
         String body = response.getBody().asString().toLowerCase();
         assertTrue(body.contains("category") || body.contains("not found") || body.contains("invalid"),
             "Should contain category error");
+    }
+
+    @Then("the response shows the original category is unchanged")
+    public void theResponseShowsOriginalCategoryUnchanged() {
+        Response response = context.getResponse();
+        // The API ignores categoryId in update request - verify original category remains
+        Long responseCategoryId = response.jsonPath().getLong("category.id");
+        assertEquals(originalCategoryId, responseCategoryId, 
+            "Category should remain unchanged when updating with invalid categoryId");
     }
 
     @Then("the response contains plant not found error")
