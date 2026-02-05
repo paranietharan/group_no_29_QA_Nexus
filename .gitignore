@@ -28,6 +28,8 @@ Thumbs.db
 /cucumber-report/
 *.html
 /surefire-reports/
+/allure-results/
 
 # Misc
 *.swp
+.allure
