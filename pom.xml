@@ -9,9 +9,9 @@
   <version>1.0.0-SNAPSHOT</version>
 
   <properties>
-    <maven.compiler.source>25</maven.compiler.source>
-    <maven.compiler.target>25</maven.compiler.target>
-    <maven.compiler.release>25</maven.compiler.release>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <maven.compiler.release>11</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <cucumber.version>7.14.0</cucumber.version>
     <junit.version>5.10.2</junit.version>
@@ -23,12 +23,20 @@
   </properties>
 
   <dependencies>
+
     <dependency>
       <groupId>io.cucumber</groupId>
+      
       <artifactId>cucumber-java</artifactId>
       <version>${cucumber.version}</version>
       <scope>test</scope>
     </dependency>
+      <dependency>
+    <groupId>io.cucumber</groupId>
+    <artifactId>cucumber-picocontainer</artifactId>
+    <version>${cucumber.version}</version>
+    <scope>test</scope>
+  </dependency>
     <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-junit-platform-engine</artifactId>
@@ -41,6 +49,7 @@
       <version>${junit.platform.version}</version>
       <scope>test</scope>
     </dependency>
+  
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter</artifactId>
@@ -83,7 +92,10 @@
       <version>5.7.0</version>
       <scope>test</scope>
     </dependency>
+
+    
   </dependencies>
+
 
   <build>
     <plugins>
@@ -97,18 +109,20 @@
           <showDeprecation>true</showDeprecation>
         </configuration>
       </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>3.2.5</version>
-        <configuration>
-          <useModulePath>false</useModulePath>
-          <testFailureIgnore>true</testFailureIgnore>
-          <includes>
-            <include>**/*Test.java</include>
-          </includes>
-        </configuration>
-      </plugin>
+   <plugin>
+  <groupId>org.apache.maven.plugins</groupId>
+  <artifactId>maven-surefire-plugin</artifactId>
+  <version>3.2.5</version>
+  <configuration>
+    <useModulePath>false</useModulePath>
+    <includes>
+      <include>**/*Test.java</include>
+      <include>**/*Tests.java</include>
+      <include>**/*IT.java</include>
+    </includes>
+  </configuration>
+</plugin>
+
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>

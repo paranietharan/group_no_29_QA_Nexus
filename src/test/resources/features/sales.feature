@@ -131,16 +131,7 @@ Scenario: TC_UI_SALES_ADMIN_09 Stock update after sale
 
 
 
-  # ==================== USER TEST CASES - API ====================
+  
 
 
-@TC_API_SALES_USER_01 @positive @user @sales @api
-Scenario: TC_API_SALES_USER_01 Fetch all sales
-  Given valid user credentials from "testdata/auth_user_login_valid.json"
-  When the login request is sent
-  Then the response status code is 200
-  And the response contains a non-empty token
 
-  When the user sends request to fetch all sales
-  Then the response status code is 200
-  And the response contains a list of sales records

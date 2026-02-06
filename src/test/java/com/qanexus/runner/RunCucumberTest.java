@@ -11,10 +11,7 @@ import static io.cucumber.junit.platform.engine.Constants.PLUGIN_PROPERTY_NAME;
 @Suite
 @IncludeEngines("cucumber")
 @SelectClasspathResource("features")
-@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.qanexus")
-@ConfigurationParameter(
-        key = PLUGIN_PROPERTY_NAME,
-        value = "pretty, html:target/cucumber-report.html, json:target/cucumber-report.json, junit:target/cucumber-report.xml"
-)
+@ConfigurationParameter(key = GLUE_PROPERTY_NAME, value = "com.qanexus.steps")
+@ConfigurationParameter(key = PLUGIN_PROPERTY_NAME, value = "pretty, html:target/cucumber-report.html, json:target/cucumber.json")
 public class RunCucumberTest {
 }

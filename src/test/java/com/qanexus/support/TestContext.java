@@ -7,6 +7,15 @@ public class TestContext {
     private String password;
     private Response response;
     private String token;
+private Long saleId;
+
+public Long getSaleId() {
+    return saleId;
+}
+
+public void setSaleId(Long saleId) {
+    this.saleId = saleId;
+}
 
     public String getUsername() {
         return username;
