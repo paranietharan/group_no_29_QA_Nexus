@@ -1,5 +1,6 @@
 package com.qanexus.steps;
 
+import com.qanexus.api.ApiClient;
 import com.qanexus.api.AuthApi;
 import com.qanexus.support.TestContext;
 import com.qanexus.support.TestDataLoader;
@@ -15,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class AuthLoginSteps {
     private final TestContext context = new TestContext();
     private final AuthApi authApi = new AuthApi();
+    private final ApiClient apiClient = new ApiClient();
 
     @Given("the authentication service is available")
     public void theAuthenticationServiceIsAvailable() {
@@ -118,6 +120,61 @@ public class AuthLoginSteps {
         Response response = authApi.login(context.getUsername(), context.getPassword());
         context.setResponse(response);
     }
+
+    @When("the login request is sent with empty json")
+    public void theLoginRequestIsSentWithEmptyJson() {
+        Response response = authApi.loginRaw("{}");
+        context.setResponse(response);
+    }
+
+    @When("I access the categories endpoint without token")
+    public void iAccessTheCategoriesEndpointWithoutToken() {
+        Response response = apiClient.request()
+                .get("/api/categories");
+        context.setResponse(response);
+    }
+
+    @When("I access the categories endpoint with non-jwt token")
+    public void iAccessTheCategoriesEndpointWithNonJwtToken() {
+        Response response = apiClient.request()
+                .header("Authorization", "Bearer not-a-jwt")
+                .get("/api/categories");
+        context.setResponse(response);
+    }
+
+    @When("I access the categories endpoint with admin token")
+    public void iAccessTheCategoriesEndpointWithAdminToken() {
+        String token = context.getToken();
+        assertNotNull(token, "Token should exist before accessing categories endpoint");
+        Response response = apiClient.request()
+                .header("Authorization", "Bearer " + token)
+                .get("/api/categories");
+        context.setResponse(response);
+    }
+
+    @When("I access the admin categories endpoint with user token")
+    public void iAccessTheAdminCategoriesEndpointWithUserToken() {
+        String token = context.getToken();
+        assertNotNull(token, "Token should exist before accessing admin endpoint");
+        String name = "Cat" + (System.currentTimeMillis() % 10000);
+        String payload = "{\"name\":\"" + name + "\"}";
+        Response response = apiClient.request()
+                .header("Authorization", "Bearer " + token)
+            .body(payload)
+            .post("/api/categories");
+        context.setResponse(response);
+    }
+
+    @When("I access the categories endpoint with user token")
+    public void iAccessTheCategoriesEndpointWithUserToken() {
+        String token = context.getToken();
+        assertNotNull(token, "Token should exist before accessing categories endpoint");
+        Response response = apiClient.request()
+                .header("Authorization", "Bearer " + token)
+                .get("/api/categories");
+        context.setResponse(response);
+    }
+
 
     @Then("the response status code is {int}")
     public void theResponseStatusCodeIs(int statusCode) {
