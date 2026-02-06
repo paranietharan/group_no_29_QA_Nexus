@@ -1,7 +1,6 @@
 package com.qanexus.steps;
 
 import com.qanexus.api.AuthApi;
-import com.qanexus.api.CategoryApi;
 import com.qanexus.api.PlantApi;
 import com.qanexus.support.TestContext;
 import io.cucumber.java.en.And;
@@ -18,7 +17,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class PlantApiSteps {
     private final TestContext context = new TestContext();
     private final PlantApi plantApi = new PlantApi();
-    private final CategoryApi categoryApi = new CategoryApi();
     private final AuthApi authApi = new AuthApi();
     
     private String plantName;
@@ -61,6 +59,11 @@ public class PlantApiSteps {
             List<Map<String, Object>> plantList = plants.jsonPath().getList("");
             if (plantList != null && !plantList.isEmpty()) {
                 plantId = Long.valueOf(plantList.get(0).get("id").toString());
+                // Get category from existing plant
+                Map<String, Object> category = (Map<String, Object>) plantList.get(0).get("category");
+                if (category != null) {
+                    categoryId = Long.valueOf(category.get("id").toString());
+                }
                 return;
             }
         }
@@ -70,79 +73,50 @@ public class PlantApiSteps {
         if (adminLogin.statusCode() == 200) {
             String adminToken = adminLogin.jsonPath().getString("token");
 
-            // Get sub-category or create one
-            Long subCatId = null;
-            Response subCats = categoryApi.getSubCategories(adminToken);
-            if (subCats.statusCode() == 200) {
-                List<Map<String, Object>> subList = subCats.jsonPath().getList("");
-                if (subList != null && !subList.isEmpty()) {
-                    subCatId = Long.valueOf(subList.get(0).get("id").toString());
-                }
-            }
-
-            // Create category hierarchy if needed
+            // Get category from existing plants or use default
+            Long subCatId = getCategoryIdFromExistingPlants(adminToken);
             if (subCatId == null) {
-                Response cats = categoryApi.getAllCategories(adminToken);
-                Long mainCatId = null;
-                if (cats.statusCode() == 200) {
-                    List<Map<String, Object>> catList = cats.jsonPath().getList("");
-                    if (catList != null && !catList.isEmpty()) {
-                        mainCatId = Long.valueOf(catList.get(0).get("id").toString());
-                    }
-                }
-                if (mainCatId == null) {
-                    Response mainCat = categoryApi.createCategory(adminToken, "Flowers", null);
-                    if (mainCat.statusCode() == 201 || mainCat.statusCode() == 200) {
-                        mainCatId = mainCat.jsonPath().getLong("id");
-                    }
-                }
-                if (mainCatId != null) {
-                    Response subCat = categoryApi.createCategory(adminToken, "Roses", mainCatId);
-                    if (subCat.statusCode() == 201 || subCat.statusCode() == 200) {
-                        subCatId = subCat.jsonPath().getLong("id");
-                    }
-                }
+                subCatId = 2L; // Default sub-category ID (Roses)
             }
 
             // Create plant under sub-category
-            if (subCatId != null) {
-                Response created = plantApi.createPlant(adminToken, subCatId,
-                    "TestPlant" + System.currentTimeMillis(), 100.0, 10);
-                if (created.statusCode() == 201) {
-                    plantId = created.jsonPath().getLong("id");
-                    return;
-                }
+            Response created = plantApi.createPlant(adminToken, subCatId,
+                "TestPlant" + System.currentTimeMillis(), 100.0, 10);
+            if (created.statusCode() == 201) {
+                plantId = created.jsonPath().getLong("id");
+                categoryId = subCatId;
+                return;
             }
         }
 
         // Fallback to provided ID
         plantId = (long) id;
+        categoryId = 2L;
     }
 
-    private void ensureSubCategoryExistsWithToken(String token) {
-        Response cats = categoryApi.getAllCategories(token);
-        if (cats.statusCode() == 200) {
-            List<Map<String, Object>> catList = cats.jsonPath().getList("");
-            if (catList != null) {
-                for (Map<String, Object> cat : catList) {
-                    Long parentId = cat.get("parentId") != null ?
-                        Long.valueOf(cat.get("parentId").toString()) : null;
-                    if (parentId != null) {
-                        categoryId = Long.valueOf(cat.get("id").toString());
-                        return;
-                    }
-                }
-                // No sub-category, use first category
-                if (!catList.isEmpty()) {
-                    categoryId = Long.valueOf(catList.get(0).get("id").toString());
-                    return;
+    private Long getCategoryIdFromExistingPlants(String token) {
+        Response plants = plantApi.getAllPlants(token);
+        if (plants.statusCode() == 200) {
+            List<Map<String, Object>> plantList = plants.jsonPath().getList("");
+            if (plantList != null && !plantList.isEmpty()) {
+                Map<String, Object> category = (Map<String, Object>) plantList.get(0).get("category");
+                if (category != null) {
+                    return Long.valueOf(category.get("id").toString());
                 }
             }
         }
-        // Default fallback
-        if (categoryId == null) {
-            categoryId = 1L;
+        return null;
+    }
+
+    private void ensureSubCategoryExistsWithToken(String token) {
+        // Get category from existing plants
+        Long catId = getCategoryIdFromExistingPlants(token);
+        if (catId != null) {
+            categoryId = catId;
+            return;
         }
+        // Default fallback
+        categoryId = 2L; // Default sub-category ID (Roses)
     }
 
     @Given("a plant with ID exists")
@@ -585,15 +559,13 @@ public class PlantApiSteps {
     // ===================== Helper Methods =====================
 
     private void ensureSubCategoryExists() {
-        Response subCats = categoryApi.getSubCategories(context.getToken());
-        if (subCats.statusCode() == 200) {
-            List<Map<String, Object>> categories = subCats.jsonPath().getList("");
-            if (categories != null && !categories.isEmpty()) {
-                categoryId = Long.valueOf(categories.get(0).get("id").toString());
-                return;
-            }
+        // Get category from existing plants
+        Long catId = getCategoryIdFromExistingPlants(context.getToken());
+        if (catId != null) {
+            categoryId = catId;
+            return;
         }
-        // Fallback: try to create or use default
-        categoryId = 1L;
+        // Fallback: use default sub-category
+        categoryId = 2L; // Default sub-category ID (Roses)
     }
 }
