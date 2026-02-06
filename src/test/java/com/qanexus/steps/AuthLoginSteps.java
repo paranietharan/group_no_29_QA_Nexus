@@ -13,8 +13,12 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class AuthLoginSteps {
-    private final TestContext context = new TestContext();
+    private final TestContext context;
     private final AuthApi authApi = new AuthApi();
+
+    public AuthLoginSteps(TestContext context) {
+        this.context = context;
+    }
 
     @Given("the authentication service is available")
     public void theAuthenticationServiceIsAvailable() {
