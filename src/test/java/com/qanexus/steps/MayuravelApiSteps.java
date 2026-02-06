@@ -33,7 +33,6 @@ public class MayuravelApiSteps {
         this.testData = new HashMap<>();
     }
 
-        // ==================== ADMIN BULK OPERATIONS ====================
 
     @When("admin sends bulk update request to plants endpoint")
     public void adminSendsBulkUpdateRequestToPlantsEndpoint() {
@@ -53,8 +52,6 @@ public class MayuravelApiSteps {
         Assertions.assertTrue(actualStatus == status1 || actualStatus == status2,
             "Status code should be " + status1 + " or " + status2 + " but got " + actualStatus);
     }
-
-    // ==================== ADMIN CROSS-MODULE CONSISTENCY ====================
 
     @Given("a category with plants exists")
     public void aCategoryWithPlantsExists() {
@@ -105,8 +102,6 @@ public class MayuravelApiSteps {
             }
         }
     }
-
-    // ==================== USER API STEPS ====================
 
     @When("user sends GET request to categories endpoint with page {int} and size {int}")
     public void userSendsGetRequestToCategoriesEndpointWithPageAndSize(int page, int size) {
@@ -227,8 +222,6 @@ public class MayuravelApiSteps {
             "Should get access denied (403/401) but got " + statusCode);
     }
 
-    // ==================== BACKGROUND ====================
-
     @Given("the API service is available")
     public void theApiServiceIsAvailable() {
         String baseUrl = System.getProperty("api.baseUrl", "http://localhost:8080");
@@ -268,7 +261,6 @@ public class MayuravelApiSteps {
             }
         }
 
-        // If no endpoint worked, try a simple TCP connection
         if (!serviceAvailable) {
             try {
                 URL url = new URL(baseUrl);
@@ -291,8 +283,6 @@ public class MayuravelApiSteps {
             ". Please ensure the application is running.");
     }
 
-    // ==================== AUTHENTICATION ====================
-
     @Given("admin is authenticated")
     public void adminIsAuthenticated() {
         logger.info("Authenticating admin user");
@@ -300,7 +290,6 @@ public class MayuravelApiSteps {
         credentials.put("username", "admin");
         credentials.put("password", "admin123");
 
-        // Try multiple authentication endpoints
         String[] authEndpoints = {
             "/api/auth/login",
             "/auth/login",
@@ -326,7 +315,6 @@ public class MayuravelApiSteps {
             }
         }
 
-        // If no endpoint worked, create a mock token for testing
         logger.warn("Authentication failed, using mock token for testing");
         authToken = "mock_admin_token_" + System.currentTimeMillis();
         context.setToken(authToken);
@@ -342,7 +330,6 @@ public class MayuravelApiSteps {
 
         logger.info("User authentication attempt - username: {}", username);
 
-        // Try multiple authentication endpoints
         String[] authEndpoints = {
             "/api/auth/login",
             "/auth/login",
@@ -368,13 +355,10 @@ public class MayuravelApiSteps {
             }
         }
 
-        // If no endpoint worked, create a mock token for testing
         logger.warn("Authentication failed, using mock token for testing");
         authToken = "mock_user_token_" + System.currentTimeMillis();
         context.setToken(authToken);
     }
-
-    // ==================== ADMIN SUMMARY REQUESTS ====================
 
     @When("admin sends GET request to plant summary endpoint")
     public void adminSendsGetRequestToPlantSummaryEndpoint() {
@@ -424,8 +408,6 @@ public class MayuravelApiSteps {
         }
     }
 
-    // ==================== ADMIN SEARCH REQUESTS ====================
-
     @When("admin sends GET request with search param {string} to categories endpoint")
     public void adminSendsGetRequestWithSearchParamToCategoriesEndpoint(String searchTerm) {
         logger.info("Admin searching categories with param: {}", searchTerm);
@@ -458,8 +440,6 @@ public class MayuravelApiSteps {
         Assertions.assertNotNull(currentResponse.getBody(), "Filtered plant results should not be null");
     }
 
-    // ==================== ADMIN INVALID PAGINATION ====================
-
     @Then("the response contains appropriate error message about invalid pagination")
     public void theResponseContainsAppropriateErrorMessageAboutInvalidPagination() {
         Response currentResponse = context.getResponse();
@@ -468,8 +448,6 @@ public class MayuravelApiSteps {
         String errorMessage = currentResponse.getBody().asString();
         Assertions.assertTrue(!errorMessage.isEmpty(), "Error message should be present");
     }
-
-    // ==================== ADMIN SORTING REQUESTS ====================
 
     @When("admin sends GET request to plants endpoint with sort {string}")
     public void adminSendsGetRequestToPlantsEndpointWithSort(String sortParam) {
@@ -498,8 +476,6 @@ public class MayuravelApiSteps {
         }
     }
 
-    // ==================== ADMIN HEALTH ENDPOINT ====================
-
     @When("admin sends GET request to health endpoint")
     public void adminSendsGetRequestToHealthEndpoint() {
         logger.info("Admin accessing health endpoint");
@@ -514,8 +490,6 @@ public class MayuravelApiSteps {
         Assertions.assertEquals(200, currentResponse.getStatusCode(), "Health endpoint should return 200");
     }
 
-    // ==================== ADMIN SUBCATEGORIES ====================
-
     @When("admin sends GET request to subcategories endpoint")
     public void adminSendsGetRequestToSubcategoriesEndpoint() {
         logger.info("Admin fetching subcategories");
@@ -529,8 +503,6 @@ public class MayuravelApiSteps {
         Assertions.assertNotNull(currentResponse.getBody(), "Subcategories list should not be null");
     }
 
-    // ==================== ADMIN MAIN CATEGORIES ====================
-
     @When("admin sends GET request to main categories endpoint")
     public void adminSendsGetRequestToMainCategoriesEndpoint() {
         logger.info("Admin fetching main categories");
@@ -543,8 +515,6 @@ public class MayuravelApiSteps {
         Response currentResponse = context.getResponse();
         Assertions.assertNotNull(currentResponse.getBody(), "Main categories list should not be null");
     }
-
-    // ==================== ADMIN FILTER BY LOW STOCK ====================
 
     @When("admin sends GET request to plants endpoint with lowStock filter {word}")
     public void adminSendsGetRequestToPlantsEndpointWithLowStockFilter(String lowStockValue) {
@@ -561,8 +531,6 @@ public class MayuravelApiSteps {
         Response currentResponse = context.getResponse();
         Assertions.assertNotNull(currentResponse.getBody(), "Low stock plants list should not be null");
     }
-
-    // ==================== ADMIN EXPORT ====================
 
     @When("admin sends GET request to export endpoint for plants")
     public void adminSendsGetRequestToExportEndpointForPlants() {
@@ -590,8 +558,6 @@ public class MayuravelApiSteps {
         }
     }
 
-    // ==================== ADMIN BULK OPERATIONS STATUS ====================
-
     @Then("the operation is completed successfully")
     public void theOperationIsCompletedSuccessfully() {
         Response currentResponse = context.getResponse();
@@ -599,15 +565,11 @@ public class MayuravelApiSteps {
             "Operation should complete with success status code");
     }
 
-    // ==================== ADMIN CROSS-MODULE CONSISTENCY STATUS ====================
-
     @And("data consistency is maintained")
     public void dataConsistencyIsMaintained() {
         logger.info("Data consistency check passed");
         Assertions.assertTrue(true, "Data consistency maintained");
     }
-
-    // ==================== PAGINATION RESPONSE CONTENT ====================
 
     @Then("the response contains paginated category list")
     public void theResponseContainsPaginatedCategoryList() {
@@ -646,8 +608,6 @@ public class MayuravelApiSteps {
         Assertions.assertNotNull(currentResponse.getBody(), "Filtered results should not be null");
     }
 
-    // ==================== ADMIN PAGINATION REQUESTS ====================
-
     @When("admin sends GET request to categories endpoint with page {int} and size {int}")
     public void adminSendsGetRequestToCategoriesEndpointWithPageAndSize(int page, int size) {
         logger.info("Admin fetching categories - page: {}, size: {}", page, size);
@@ -655,7 +615,6 @@ public class MayuravelApiSteps {
         params.put("page", String.valueOf(page));
         params.put("size", String.valueOf(size));
 
-        // Try multiple endpoints
         String[] endpoints = {
             "/api/categories",
             "/categories",
@@ -673,7 +632,6 @@ public class MayuravelApiSteps {
             }
         }
 
-        // Create mock response if all endpoints fail
         logger.warn("All endpoints failed, creating mock response");
         createMockPaginationResponse();
     }
@@ -685,7 +643,6 @@ public class MayuravelApiSteps {
         params.put("page", String.valueOf(page));
         params.put("size", String.valueOf(size));
 
-        // Try multiple endpoints
         String[] endpoints = {
             "/api/plants",
             "/plants",
@@ -703,7 +660,6 @@ public class MayuravelApiSteps {
             }
         }
 
-        // Create mock response if all endpoints fail
         logger.warn("All endpoints failed, creating mock response");
         createMockPaginationResponse();
     }
@@ -715,7 +671,6 @@ public class MayuravelApiSteps {
         params.put("page", String.valueOf(page));
         params.put("size", String.valueOf(size));
 
-        // Try multiple endpoints
         String[] endpoints = {
             "/api/sales",
             "/sales",
@@ -733,17 +688,11 @@ public class MayuravelApiSteps {
             }
         }
 
-        // Create mock response if all endpoints fail
         logger.warn("All endpoints failed, creating mock response");
         createMockPaginationResponse();
     }
 
-    // ==================== HELPER METHODS ====================
-
     private void createMockPaginationResponse() {
-        // Create a mock response for testing when real API is not available
-        // You would need to modify your ApiClient to support mock responses
-        // For now, we'll just log and continue
         logger.info("Created mock pagination response for testing");
     }
 }

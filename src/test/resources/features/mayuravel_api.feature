@@ -7,8 +7,6 @@ Feature: Mayuravel API Test Cases - Categories, Plants, and Sales
   Background:
     Given the API service is available
 
-  # ==================== ADMIN API TEST CASES ====================
-
   @TC-API-ADMIN-01 @positive @admin @pagination
   Scenario: TC-API-ADMIN-01 Admin fetches paginated categories successfully
     Given admin is authenticated
@@ -88,8 +86,6 @@ Feature: Mayuravel API Test Cases - Categories, Plants, and Sales
     And admin fetches plants under that category
     Then the plants show error or null category
     And data consistency is maintained
-
-  # ==================== USER API TEST CASES ====================
 
   @TC-API-USER-01 @positive @user @pagination
   Scenario: TC-API-USER-01 User fetches paginated categories successfully

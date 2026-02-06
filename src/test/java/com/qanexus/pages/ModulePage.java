@@ -10,26 +10,21 @@ import java.util.List;
 
 public class ModulePage extends BasePage {
 
-    // Page content locators
     private By pageContentLocator = By.cssSelector(".page-content, .main-content, .module-content, .content-area");
     private By pageHeaderLocator = By.cssSelector("h1, .page-header, .page-title");
-    
-    // Button locators
+
     private By addButtonLocator = By.cssSelector(".add-btn, .btn-add, button[aria-label='add'], .create-btn");
     private By editButtonsLocator = By.cssSelector(".edit-btn, .btn-edit, button[aria-label='edit'], [data-action='edit']");
     private By deleteButtonsLocator = By.cssSelector(".delete-btn, .btn-delete, button[aria-label='delete'], [data-action='delete']");
-    
-    // Pagination locators
+
     private By paginationLocator = By.cssSelector(".pagination, .pagination-controls, nav[aria-label='pagination']");
     private By nextPageLocator = By.cssSelector(".page-link[aria-label='Next'], .next-page, .pagination-next");
     private By prevPageLocator = By.cssSelector(".page-link[aria-label='Previous'], .prev-page, .pagination-prev");
-    
-    // Loading and data locators
+
     private By loadingLocator = By.cssSelector(".loading, .spinner, .loader, .progress-bar");
     private By dataRowsLocator = By.cssSelector(".data-row, .table-row, tbody tr, .list-item, [role='row']");
     private By noDataLocator = By.cssSelector(".no-data, .empty-state, .no-results, .zero-state");
 
-    // PageFactory elements as backup
     @FindBy(css = ".page-content, .main-content")
     private WebElement pageContent;
     
@@ -42,19 +37,16 @@ public class ModulePage extends BasePage {
 
     public boolean isPageDisplayed() {
         try {
-            // Check by URL pattern
             String currentUrl = getCurrentUrl();
             boolean isModuleUrl = currentUrl.contains("categories") ||
                                  currentUrl.contains("plants") ||
                                  currentUrl.contains("sales") ||
                                  currentUrl.contains("list") ||
                                  currentUrl.contains("table");
-            
-            // Check by page content
+
             boolean hasContent = driver.findElements(pageContentLocator).stream()
                 .anyMatch(WebElement::isDisplayed);
-            
-            // Check by page header
+
             boolean hasHeader = driver.findElements(pageHeaderLocator).stream()
                 .anyMatch(WebElement::isDisplayed);
             
@@ -126,7 +118,6 @@ public class ModulePage extends BasePage {
         try {
             wait.until(ExpectedConditions.invisibilityOfElementLocated(loadingLocator));
         } catch (Exception e) {
-            // Loading indicator not found or already disappeared
         }
     }
 
@@ -176,8 +167,6 @@ public class ModulePage extends BasePage {
         }
     }
 
-    // New methods for feature file support
-    
     public boolean hasLoadingIndicator() {
         return isLoadingIndicatorVisible();
     }

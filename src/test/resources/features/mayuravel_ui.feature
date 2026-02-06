@@ -4,8 +4,6 @@ Feature: Mayuravel UI Test Cases - Dashboard and Navigation
   I want to test the UI functionality for admin and user roles
   So that I can verify the dashboard, navigation, and user interface
 
-  # ==================== ADMIN UI TEST CASES ====================
-
   @TC-UI-ADMIN-01 @positive @admin @ui @dashboard
   Scenario: TC-UI-ADMIN-01 Admin dashboard loads after login
     Given admin navigates to login page
@@ -86,8 +84,6 @@ Feature: Mayuravel UI Test Cases - Dashboard and Navigation
     Then the UI adjusts correctly for mobile
     When admin views dashboard on tablet device
     Then the UI adjusts correctly for tablet
-
-  # ==================== USER UI TEST CASES ====================
 
   @TC-UI-USER-01 @positive @user @ui @dashboard
   Scenario: TC-UI-USER-01 User dashboard loads after login

@@ -17,20 +17,15 @@ public class MayuravelDashboardPage extends BasePage {
     public MayuravelDashboardPage(WebDriver driver) {
         super(driver);
     }
-
-    // ==================== DASHBOARD DISPLAY ====================
     
     public boolean isDashboardDisplayed() {
         try {
-            // Check URL
             String currentUrl = getCurrentUrl();
             boolean byUrl = currentUrl.contains("dashboard") || currentUrl.contains("home");
-            
-            // Check title
+
             String title = getTitle().toLowerCase();
             boolean byTitle = title.contains("dashboard") || title.contains("home");
-            
-            // Check for dashboard elements
+
             String[] dashboardSelectors = {
                 ".dashboard",
                 ".main-content", 
@@ -68,11 +63,10 @@ public class MayuravelDashboardPage extends BasePage {
             return Duration.between(start, end).toMillis();
         } catch (Exception e) {
             logger.error("Failed to measure dashboard load time: {}", e.getMessage());
-            return 10000; // Return 10 seconds as fallback instead of Long.MAX_VALUE
+            return 10000;
         }
     }
 
-    // ==================== SUMMARY CARDS ====================
     
     public boolean isCategoriesSummaryCardDisplayed() {
         return isElementDisplayed(
@@ -144,14 +138,12 @@ public class MayuravelDashboardPage extends BasePage {
 
     public String getPlantCount() {
         try {
-            // First find the plants card
             WebElement plantsCard = findElementWithMultipleSelectors(
                 ".summary-card[data-module='plants']",
                 ".card-plants",
                 "#plants-card"
             );
-            
-            // Look for count within the card
+
             List<WebElement> countElements = plantsCard.findElements(
                 By.cssSelector(".count, .value, .card-value, h1, h2, h3, .stat-number, .number")
             );
@@ -159,7 +151,6 @@ public class MayuravelDashboardPage extends BasePage {
             for (WebElement element : countElements) {
                 String text = element.getText().trim();
                 if (!text.isEmpty()) {
-                    // Extract numbers from text
                     String numbers = text.replaceAll("[^0-9]", "");
                     if (!numbers.isEmpty()) {
                         return numbers;
@@ -167,14 +158,13 @@ public class MayuravelDashboardPage extends BasePage {
                 }
             }
             
-            return "0"; // Default if no count found
+            return "0";
         } catch (Exception e) {
             logger.error("Error getting plant count: {}", e.getMessage());
             return "0";
         }
     }
 
-    // ==================== NAVIGATION ====================
     
     public void navigateToCategoriesPage() {
         clickElementWithMultipleSelectors(
@@ -265,25 +255,20 @@ public class MayuravelDashboardPage extends BasePage {
             return false;
         }
     }
-
-    // ==================== RESPONSIVE DESIGN ====================
     
     public void resizeBrowserWindow(int width, int height) {
         driver.manage().window().setSize(new org.openqa.selenium.Dimension(width, height));
         try {
-            Thread.sleep(1000); // Wait for resize to take effect
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
     }
 
     public boolean hasOverlappingElements() {
-        // Simplified check - in a real implementation you would check element positions
-        // For now, just return false assuming no overlap
+
         return false;
     }
-
-    // ==================== THEME AND STYLING ====================
     
     public String getThemeColor() {
         try {
@@ -300,8 +285,6 @@ public class MayuravelDashboardPage extends BasePage {
             return "";
         }
     }
-
-    // ==================== BREADCRUMBS ====================
     
     public boolean areBreadcrumbsDisplayed() {
         return isElementDisplayed(".breadcrumb", ".breadcrumbs", "[aria-label='breadcrumb']");
@@ -317,8 +300,6 @@ public class MayuravelDashboardPage extends BasePage {
             return false;
         }
     }
-
-    // ==================== ERROR HANDLING ====================
     
     public boolean isErrorMessageDisplayed() {
         return isElementDisplayed(
@@ -343,8 +324,6 @@ public class MayuravelDashboardPage extends BasePage {
             return "";
         }
     }
-
-    // ==================== UTILITY METHODS ====================
     
     private boolean isElementDisplayed(String... selectors) {
         for (String selector : selectors) {
@@ -378,8 +357,7 @@ public class MayuravelDashboardPage extends BasePage {
                 continue;
             }
         }
-        
-        // If all selectors fail, try to find by scanning all links
+
         if (selectors.length > 0) {
             String targetText = extractTargetTextFromSelectors(selectors);
             if (targetText != null) {
@@ -406,14 +384,12 @@ public class MayuravelDashboardPage extends BasePage {
     private String extractTargetTextFromSelectors(String[] selectors) {
         for (String selector : selectors) {
             if (selector.contains("contains('")) {
-                // Extract text from :contains() pseudo-selector
                 int start = selector.indexOf("contains('") + 10;
                 int end = selector.indexOf("')", start);
                 if (end > start) {
                     return selector.substring(start, end);
                 }
             } else if (selector.contains("contains(text(),")) {
-                // Extract text from XPath contains(text())
                 int start = selector.indexOf("contains(text(),'") + 18;
                 int end = selector.indexOf("')]", start);
                 if (end > start) {
@@ -448,8 +424,6 @@ public class MayuravelDashboardPage extends BasePage {
         waitForClickable(element);
         element.click();
     }
-
-        // ==================== AUTHORIZATION CHECKS ====================
     
     public boolean hasEditButtons() {
         return isElementDisplayed(
@@ -486,9 +460,7 @@ public class MayuravelDashboardPage extends BasePage {
         );
     }
 
-    // Helper method to check for admin-only navigation items
     public boolean hasAdminOnlyNavItems() {
-        // Check for admin-specific navigation items
         String[] adminNavSelectors = {
             "nav a[href*='admin']",
             "nav a[href*='settings']",
@@ -511,15 +483,12 @@ public class MayuravelDashboardPage extends BasePage {
         return false;
     }
 
-    // Check if user has any action buttons (add/edit/delete)
     public boolean hasAnyActionButtons() {
         return hasAddButtons() || hasEditButtons() || hasDeleteButtons();
     }
 
-    // Check if elements are disabled (grayed out) for read-only users
     public boolean areActionButtonsDisabled() {
         try {
-            // Check if any action buttons exist and are disabled
             String[] actionButtonSelectors = {
                 ".edit-btn:disabled",
                 ".btn-edit:disabled",
@@ -549,7 +518,6 @@ public class MayuravelDashboardPage extends BasePage {
         }
     }
 
-    // Check for read-only indicators
     public boolean hasReadOnlyIndicators() {
         return isElementDisplayed(
             "[readonly]",
@@ -561,12 +529,10 @@ public class MayuravelDashboardPage extends BasePage {
         );
     }
 
-    // Check if in read-only mode
     public boolean isReadOnlyMode() {
         return hasReadOnlyIndicators() || !hasEditButtons() || !hasDeleteButtons();
     }
 
-    // Check if has admin-only UI elements
     public boolean hasAdminOnlyUIElements() {
         return isElementDisplayed(
             "[data-admin-only]",
@@ -577,7 +543,6 @@ public class MayuravelDashboardPage extends BasePage {
         );
     }
 
-    // Check if has admin-only menu items
     public boolean hasAdminOnlyMenuItems() {
         return isElementDisplayed(
             ".nav-item[data-admin-only]",
@@ -587,7 +552,6 @@ public class MayuravelDashboardPage extends BasePage {
         );
     }
 
-    // Check if navigation menu is visible
     public boolean isNavigationMenuVisible() {
         return isElementDisplayed(
             ".navbar",
@@ -598,7 +562,6 @@ public class MayuravelDashboardPage extends BasePage {
         );
     }
 
-    // Check if has categories menu
     public boolean hasCategoriesMenu() {
         return isElementDisplayed(
             ".nav-categories",
@@ -608,7 +571,6 @@ public class MayuravelDashboardPage extends BasePage {
         );
     }
 
-    // Check if has plants menu
     public boolean hasPlantsMenu() {
         return isElementDisplayed(
             ".nav-plants",
@@ -618,7 +580,6 @@ public class MayuravelDashboardPage extends BasePage {
         );
     }
 
-    // Check if has sales menu
     public boolean hasSalesMenu() {
         return isElementDisplayed(
             ".nav-sales",
@@ -628,7 +589,6 @@ public class MayuravelDashboardPage extends BasePage {
         );
     }
 
-    // Click logout button
     public void clickLogoutButton() {
         try {
             String[] logoutSelectors = {
