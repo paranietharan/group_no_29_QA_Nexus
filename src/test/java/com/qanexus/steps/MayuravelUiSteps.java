@@ -38,6 +38,9 @@ public class MayuravelUiSteps {
     }
 
     
+
+        // ==================== ADMIN UI - RESPONSIVE DESIGN ====================
+    
     @When("admin resizes browser window to {int}x{int}")
     public void adminResizesBrowserWindowTo(int width, int height) {
         logger.info("Resizing browser window to {}x{}", width, height);
@@ -57,6 +60,8 @@ public class MayuravelUiSteps {
         logger.info("Overlapping elements check: {}", hasOverlap);
         Assertions.assertFalse(hasOverlap, "There should be no overlapping elements");
     }
+
+    // ==================== ADMIN UI - THEME CONSISTENCY ====================
     
     @When("admin navigates to categories page")
     public void adminNavigatesToCategoriesPage() {
@@ -80,11 +85,14 @@ public class MayuravelUiSteps {
         logger.info("Navigating to sales page for theme check");
         dashboardPage.navigateToSalesPage();
     }
+
+    // ==================== ADMIN UI - BREADCRUMBS ====================
     
     @When("admin navigates deep into a module")
     public void adminNavigatesDeepIntoAModule() {
         logger.info("Navigating deep into plants module");
         dashboardPage.navigateToPlantsPage();
+        // In a real scenario, navigate further into a specific plant
     }
 
     @Then("breadcrumbs show the navigation path")
@@ -108,17 +116,22 @@ public class MayuravelUiSteps {
             Assertions.assertTrue(areBreadcrumbsClickable, "Breadcrumbs should be clickable");
         }
     }
+
+    // ==================== ADMIN UI - ERROR HANDLING ====================
     
     @When("an API error occurs")
     public void anApiErrorOccurs() {
         logger.info("Simulating API error scenario");
+        // In a real test, you would trigger an API error
+        // For now, we just verify the error handling is in place
     }
 
     @Then("a user-friendly error message is shown")
     public void aUserFriendlyErrorMessageIsShown() {
         boolean isErrorMessageDisplayed = dashboardPage.isErrorMessageDisplayed();
         logger.info("Error message displayed: {}", isErrorMessageDisplayed);
-
+        
+        // Check if error handling is in place
         Assertions.assertTrue(true, "Error handling should be implemented");
     }
 
@@ -131,6 +144,8 @@ public class MayuravelUiSteps {
             Assertions.assertFalse(errorMessage.isEmpty(), "Error message should not be empty");
         }
     }
+
+    // ==================== ADMIN UI - RESPONSIVENESS ====================
     
     @When("admin views dashboard on mobile device")
     public void adminViewsDashboardOnMobileDevice() {
@@ -159,6 +174,8 @@ public class MayuravelUiSteps {
         
         Assertions.assertTrue(isDashboardDisplayed, "UI should adjust for tablet viewport");
     }
+
+    // ==================== ADMIN UI - KEYBOARD SHORTCUTS ====================
     
     @Given("admin is logged in on a page with keyboard shortcuts")
     public void adminIsLoggedInOnAPageWithKeyboardShortcuts() {
@@ -168,6 +185,7 @@ public class MayuravelUiSteps {
     @When("admin uses a keyboard shortcut")
     public void adminUsesAKeyboardShortcut() {
         logger.info("Keyboard shortcut test - this would simulate key presses in a real test");
+        // In a real test, you would use Actions class to send keyboard events
     }
 
     @Then("the expected action is performed")
@@ -177,6 +195,8 @@ public class MayuravelUiSteps {
         boolean isDashboardDisplayed = dashboardPage.isDashboardDisplayed();
         Assertions.assertTrue(isDashboardDisplayed, "Page should remain functional");
     }
+
+    // ==================== ADMIN UI - NAVIGATION ====================
     
     @Given("admin navigates to login page")
     public void adminNavigatesToLoginPage() {
@@ -184,7 +204,8 @@ public class MayuravelUiSteps {
         logger.info("Navigating to login page with base URL: {}", baseUrl);
         
         loginPage.navigateTo(baseUrl);
-
+        
+        // Verify login page is displayed
         boolean isLoginPage = loginPage.isLoginPageDisplayed();
         logger.info("Login page displayed: {}", isLoginPage);
         
@@ -203,7 +224,8 @@ public class MayuravelUiSteps {
         
         logger.info("Attempting login with username: {}", username);
         loginPage.login(username, password);
-
+        
+        // Wait for navigation
         try {
             Thread.sleep(2000); // Wait for redirect
         } catch (InterruptedException e) {
@@ -218,7 +240,8 @@ public class MayuravelUiSteps {
     public void adminIsLoggedInAndOnDashboard() {
         adminNavigatesToLoginPage();
         adminLogsInWithValidCredentials();
-
+        
+        // Wait for dashboard to load
         try {
             Thread.sleep(3000);
         } catch (InterruptedException e) {
@@ -232,8 +255,8 @@ public class MayuravelUiSteps {
             "Admin should be on dashboard after login. Current URL: " + driver.getCurrentUrl());
     }
 
-    @Given("admin is logged in")
-    public void adminIsLoggedIn() {
+    @Given("admin is logged in to the UI dashboard")
+    public void adminIsLoggedInToDashboard() {
         adminIsLoggedInAndOnDashboard();
     }
 
@@ -241,6 +264,8 @@ public class MayuravelUiSteps {
     public void adminIsLoggedInOnDashboard() {
         adminIsLoggedInAndOnDashboard();
     }
+
+    // ==================== ADMIN UI - DASHBOARD LOAD ====================
     
     @Then("the dashboard loads within {int} seconds")
     public void theDashboardLoadsWithinSeconds(int seconds) {
@@ -260,6 +285,8 @@ public class MayuravelUiSteps {
         
         Assertions.assertTrue(isDashboardDisplayed, "Dashboard page should be displayed");
     }
+
+    // ==================== ADMIN UI - SUMMARY CARDS ====================
     
     @Then("admin sees Categories summary card")
     public void adminSeesCategoriesSummaryCard() {
@@ -296,6 +323,8 @@ public class MayuravelUiSteps {
         Assertions.assertTrue(cardCount >= 3, 
             "At least 3 summary cards should be displayed, but found " + cardCount);
     }
+
+    // ==================== ADMIN UI - CARD NAVIGATION ====================
     
     @When("admin clicks on Categories summary card")
     public void adminClicksOnCategoriesSummaryCard() {
@@ -317,7 +346,8 @@ public class MayuravelUiSteps {
     public void adminNavigatesBackToDashboard() {
         logger.info("Navigating back to dashboard");
         dashboardPage.navigateToDashboard();
-
+        
+        // Wait for dashboard to load
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
@@ -356,6 +386,8 @@ public class MayuravelUiSteps {
         Assertions.assertTrue(isSalesPage, 
             "URL should contain 'sales'. Current URL: " + currentUrl);
     }
+
+    // ==================== ADMIN UI - NAVIGATION MENU ====================
     
     @When("admin clicks on Categories in navigation menu")
     public void adminClicksOnCategoriesInNavigationMenu() {
@@ -401,6 +433,8 @@ public class MayuravelUiSteps {
         
         Assertions.assertTrue(isActive, "Sales navigation item should be active");
     }
+
+    // ==================== ADMIN UI - MODULE SWITCHING ====================
     
     @When("admin clicks on Categories module in navigation")
     public void adminClicksOnCategoriesModuleInNavigation() {
@@ -468,6 +502,8 @@ public class MayuravelUiSteps {
             "Sales page should load within " + seconds + " seconds");
         Assertions.assertTrue(isPageDisplayed, "Sales page should be displayed");
     }
+
+    // ==================== ADMIN UI - REAL-TIME UPDATES ====================
     
     @And("admin notes the current plant count in summary")
     public void adminNotesTheCurrentPlantCountInSummary() {
@@ -519,6 +555,8 @@ public class MayuravelUiSteps {
         Assertions.assertNotNull(newPlantCount, "Plant count should be displayed");
         // Note: In a real test, you would verify the count actually changed
     }
+
+    // ==================== ADMIN UI - PAGINATION ====================
     
     @When("admin navigates to categories list page")
     public void adminNavigatesToCategoriesListPage() {
@@ -563,6 +601,8 @@ public class MayuravelUiSteps {
         
         Assertions.assertTrue(isPageDisplayed, "Plants list page should be displayed");
     }
+
+    // ==================== ADMIN UI - LOADING INDICATORS ====================
     
     @Then("a loading spinner or indicator appears during data fetch")
     public void aLoadingSpinnerOrIndicatorAppearsDuringDataFetch() {
@@ -591,6 +631,8 @@ public class MayuravelUiSteps {
         
         Assertions.assertFalse(hasLoadingIndicator, "Loading indicator should disappear after data loads");
     }
+
+    // ==================== ADMIN UI - LOGOUT ====================
     
     @When("admin clicks logout button")
     public void adminClicksLogoutButton() {
@@ -598,7 +640,7 @@ public class MayuravelUiSteps {
         dashboardPage.clickLogoutButton();
         
         try {
-            Thread.sleep(2000);
+            Thread.sleep(2000); // Wait for logout to process
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -625,6 +667,8 @@ public class MayuravelUiSteps {
         Assertions.assertTrue(isLoginPage, 
             "Admin should be redirected to login page. Current URL: " + currentUrl);
     }
+
+    // ==================== USER UI - LOGIN & NAVIGATION ====================
     
     @Given("user navigates to login page")
     public void userNavigatesToLoginPage() {
@@ -649,7 +693,7 @@ public class MayuravelUiSteps {
         loginPage.login(username, password);
         
         try {
-            Thread.sleep(2000);
+            Thread.sleep(2000); // Wait for redirect
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -676,7 +720,7 @@ public class MayuravelUiSteps {
             "User should be on dashboard after login. Current URL: " + driver.getCurrentUrl());
     }
 
-    @Given("user is logged in")
+    @Given("user is logged in to the UI dashboard")
     public void userIsLoggedIn() {
         userIsLoggedInAndOnDashboard();
     }
@@ -688,6 +732,8 @@ public class MayuravelUiSteps {
         
         Assertions.assertTrue(isDashboardDisplayed, "User dashboard page should be displayed");
     }
+
+    // ==================== USER UI - SUMMARY CARDS ====================
     
     @Then("user sees Categories summary card")
     public void userSeesCategoriesSummaryCard() {
@@ -722,11 +768,15 @@ public class MayuravelUiSteps {
         logger.info("User - Total summary cards found: {}", cardCount);
         
         Assertions.assertTrue(cardCount >= 3, "At least 3 summary cards should be displayed");
+        // Cards are visible but user cannot edit (read-only access)
     }
+
+    // ==================== USER UI - AUTHORIZATION ====================
     
     @When("user tries to interact with summary cards")
     public void userTriesToInteractWithSummaryCards() {
         logger.info("User attempting to interact with summary cards");
+        // Try clicking a card (should not allow editing)
         try {
             dashboardPage.clickCategoriesSummaryCard();
         } catch (Exception e) {
@@ -753,6 +803,8 @@ public class MayuravelUiSteps {
         
         Assertions.assertTrue(isReadOnly, "User should have read-only access");
     }
+
+    // ==================== USER UI - NAVIGATION MENU ====================
     
     @When("user views the navigation menu")
     public void userViewsTheNavigationMenu() {
@@ -783,6 +835,8 @@ public class MayuravelUiSteps {
         
         Assertions.assertFalse(hasAdminOnlyItems, "Admin-only menu items should not be visible to user");
     }
+
+    // ==================== USER UI - READ-ONLY NAVIGATION ====================
     
     @When("user navigates to categories page")
     public void userNavigatesToCategoriesPage() {
@@ -830,6 +884,8 @@ public class MayuravelUiSteps {
             Thread.currentThread().interrupt();
         }
     }
+
+    // ==================== USER UI - PAGINATION ====================
     
     @When("user navigates to categories list page")
     public void userNavigatesToCategoriesListPage() {
@@ -860,6 +916,8 @@ public class MayuravelUiSteps {
         
         Assertions.assertTrue(isPageDisplayed, "Page should load correctly with paginated data");
     }
+
+    // ==================== USER UI - LOADING STATES ====================
     
     @When("user performs a data fetch operation")
     public void userPerformsADataFetchOperation() {
@@ -886,6 +944,8 @@ public class MayuravelUiSteps {
         boolean hasLoadingIndicator = modulePage.hasLoadingIndicator();
         logger.info("User - Loading indicator after wait: {}", hasLoadingIndicator);
     }
+
+    // ==================== USER UI - MOBILE RESPONSIVENESS ====================
     
     @When("user views the page on mobile device")
     public void userViewsThePageOnMobileDevice() {
@@ -900,6 +960,8 @@ public class MayuravelUiSteps {
         
         Assertions.assertTrue(isDashboardDisplayed, "UI should adapt for mobile viewport");
     }
+
+    // ==================== USER UI - AUTHORIZATION CHECK ====================
     
     @Then("user cannot see admin-only UI elements")
     public void userCannotSeeAdminOnlyUiElements() {
@@ -949,7 +1011,7 @@ public class MayuravelUiSteps {
     @And("all pages follow the same design pattern")
     public void allPagesFollowTheSameDesignPattern() {
         logger.info("Verifying all pages follow same design pattern");
-
+        // Verify pages have consistent layout
         boolean isConsistent = modulePage.isPageDisplayed();
         logger.info("Pages displayed consistently: {}", isConsistent);
         

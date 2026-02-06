@@ -33,12 +33,96 @@ public class MayuravelApiSteps {
         this.testData = new HashMap<>();
     }
 
+    // FIX: Removed duplicate adminIsLoggedIn() method to avoid conflict with
+    // MayuravelUiSteps
+    // Use adminIsAuthenticated() instead in your feature file
+
+    // FIX: Removed duplicate userIsLoggedIn() method to avoid conflict
+    // Use userIsAuthenticated() instead in your feature file
+
+    // Authentication methods for API tests
+    @Given("admin is authenticated")
+    public void adminIsAuthenticated() {
+        logger.info("Authenticating admin user via API");
+        Map<String, String> credentials = new HashMap<>();
+        credentials.put("username", "admin");
+        credentials.put("password", "admin123");
+
+        String[] authEndpoints = {
+                "/api/auth/login",
+                "/auth/login",
+                "/login",
+                "/api/login"
+        };
+
+        for (String endpoint : authEndpoints) {
+            try {
+                logger.debug("Trying authentication endpoint: {}", endpoint);
+                response = apiClient.post(endpoint, credentials);
+
+                if (response.getStatusCode() == 200) {
+                    authToken = response.jsonPath().getString("token");
+                    if (authToken != null && !authToken.isEmpty()) {
+                        logger.info("Admin authentication successful, token obtained");
+                        context.setToken(authToken);
+                        return;
+                    }
+                }
+            } catch (Exception e) {
+                logger.warn("Failed with endpoint {}: {}", endpoint, e.getMessage());
+            }
+        }
+
+        logger.warn("Authentication failed, using mock token for testing");
+        authToken = "mock_admin_token_" + System.currentTimeMillis();
+        context.setToken(authToken);
+    }
+
+    @Given("user is authenticated")
+    public void userIsAuthenticated() {
+        logger.info("Authenticating regular user via API");
+        Map<String, String> credentials = TestDataLoader.loadJsonMap("testdata/auth_user_login_valid.json");
+
+        String username = credentials.get("username");
+        String password = credentials.get("password");
+
+        logger.info("User authentication attempt - username: {}", username);
+
+        String[] authEndpoints = {
+                "/api/auth/login",
+                "/auth/login",
+                "/login",
+                "/api/login"
+        };
+
+        for (String endpoint : authEndpoints) {
+            try {
+                logger.debug("Trying authentication endpoint: {}", endpoint);
+                response = apiClient.post(endpoint, credentials);
+
+                if (response.getStatusCode() == 200) {
+                    authToken = response.jsonPath().getString("token");
+                    if (authToken != null && !authToken.isEmpty()) {
+                        logger.info("User authentication successful, token obtained");
+                        context.setToken(authToken);
+                        return;
+                    }
+                }
+            } catch (Exception e) {
+                logger.warn("Failed with endpoint {}: {}", endpoint, e.getMessage());
+            }
+        }
+
+        logger.warn("Authentication failed, using mock token for testing");
+        authToken = "mock_user_token_" + System.currentTimeMillis();
+        context.setToken(authToken);
+    }
 
     @When("admin sends bulk update request to plants endpoint")
     public void adminSendsBulkUpdateRequestToPlantsEndpoint() {
         Map<String, Object> bulkData = new HashMap<>();
         bulkData.put("operation", "update");
-        bulkData.put("ids", new int[]{1, 2, 3});
+        bulkData.put("ids", new int[] { 1, 2, 3 });
         bulkData.put("status", "active");
 
         response = apiClient.postWithAuth("/api/plants/bulk", context.getToken(), bulkData);
@@ -50,7 +134,7 @@ public class MayuravelApiSteps {
         Response currentResponse = context.getResponse();
         int actualStatus = currentResponse.getStatusCode();
         Assertions.assertTrue(actualStatus == status1 || actualStatus == status2,
-            "Status code should be " + status1 + " or " + status2 + " but got " + actualStatus);
+                "Status code should be " + status1 + " or " + status2 + " but got " + actualStatus);
     }
 
     @Given("a category with plants exists")
@@ -97,8 +181,8 @@ public class MayuravelApiSteps {
             for (Map<String, Object> plant : plants) {
                 Object category = plant.get("category");
                 Assertions.assertTrue(category == null ||
-                    (category instanceof Map && ((Map<?, ?>) category).isEmpty()),
-                    "Plant should have null or empty category after category deletion");
+                        (category instanceof Map && ((Map<?, ?>) category).isEmpty()),
+                        "Plant should have null or empty category after category deletion");
             }
         }
     }
@@ -177,7 +261,7 @@ public class MayuravelApiSteps {
         Response currentResponse = context.getResponse();
         List<?> content = currentResponse.jsonPath().getList("content");
         Assertions.assertTrue(content.size() <= maxItems,
-            "Page should contain " + maxItems + " or fewer items, but has " + content.size());
+                "Page should contain " + maxItems + " or fewer items, but has " + content.size());
     }
 
     @Then("the results are sorted correctly by name ascending")
@@ -191,7 +275,7 @@ public class MayuravelApiSteps {
             String nextName = (String) items.get(i + 1).get("name");
             if (currentName != null && nextName != null) {
                 Assertions.assertTrue(currentName.compareToIgnoreCase(nextName) <= 0,
-                    "Items should be sorted by name ascending");
+                        "Items should be sorted by name ascending");
             }
         }
     }
@@ -219,7 +303,7 @@ public class MayuravelApiSteps {
         Response currentResponse = context.getResponse();
         int statusCode = currentResponse.getStatusCode();
         Assertions.assertTrue(statusCode == 403 || statusCode == 401,
-            "Should get access denied (403/401) but got " + statusCode);
+                "Should get access denied (403/401) but got " + statusCode);
     }
 
     @Given("the API service is available")
@@ -229,10 +313,10 @@ public class MayuravelApiSteps {
 
         // Try multiple health endpoints
         String[] healthEndpoints = {
-            "/health",
-            "/actuator/health",
-            "/api/health",
-            "/"
+                "/health",
+                "/actuator/health",
+                "/api/health",
+                "/"
         };
 
         boolean serviceAvailable = false;
@@ -247,7 +331,7 @@ public class MayuravelApiSteps {
 
                 if (statusCode == 200) {
                     logger.info("API service is available (endpoint: {}, status: {})",
-                               endpoint, statusCode);
+                            endpoint, statusCode);
                     serviceAvailable = true;
                     break;
                 } else if (statusCode == 404) {
@@ -279,85 +363,8 @@ public class MayuravelApiSteps {
         }
 
         Assertions.assertTrue(serviceAvailable,
-            "API service is not available at " + baseUrl +
-            ". Please ensure the application is running.");
-    }
-
-    @Given("admin is authenticated")
-    public void adminIsAuthenticated() {
-        logger.info("Authenticating admin user");
-        Map<String, String> credentials = new HashMap<>();
-        credentials.put("username", "admin");
-        credentials.put("password", "admin123");
-
-        String[] authEndpoints = {
-            "/api/auth/login",
-            "/auth/login",
-            "/login",
-            "/api/login"
-        };
-
-        for (String endpoint : authEndpoints) {
-            try {
-                logger.debug("Trying authentication endpoint: {}", endpoint);
-                response = apiClient.post(endpoint, credentials);
-
-                if (response.getStatusCode() == 200) {
-                    authToken = response.jsonPath().getString("token");
-                    if (authToken != null && !authToken.isEmpty()) {
-                        logger.info("Admin authentication successful, token obtained");
-                        context.setToken(authToken);
-                        return;
-                    }
-                }
-            } catch (Exception e) {
-                logger.warn("Failed with endpoint {}: {}", endpoint, e.getMessage());
-            }
-        }
-
-        logger.warn("Authentication failed, using mock token for testing");
-        authToken = "mock_admin_token_" + System.currentTimeMillis();
-        context.setToken(authToken);
-    }
-
-    @Given("user is authenticated")
-    public void userIsAuthenticated() {
-        logger.info("Authenticating regular user");
-        Map<String, String> credentials = TestDataLoader.loadJsonMap("testdata/auth_user_login_valid.json");
-
-        String username = credentials.get("username");
-        String password = credentials.get("password");
-
-        logger.info("User authentication attempt - username: {}", username);
-
-        String[] authEndpoints = {
-            "/api/auth/login",
-            "/auth/login",
-            "/login",
-            "/api/login"
-        };
-
-        for (String endpoint : authEndpoints) {
-            try {
-                logger.debug("Trying authentication endpoint: {}", endpoint);
-                response = apiClient.post(endpoint, credentials);
-
-                if (response.getStatusCode() == 200) {
-                    authToken = response.jsonPath().getString("token");
-                    if (authToken != null && !authToken.isEmpty()) {
-                        logger.info("User authentication successful, token obtained");
-                        context.setToken(authToken);
-                        return;
-                    }
-                }
-            } catch (Exception e) {
-                logger.warn("Failed with endpoint {}: {}", endpoint, e.getMessage());
-            }
-        }
-
-        logger.warn("Authentication failed, using mock token for testing");
-        authToken = "mock_user_token_" + System.currentTimeMillis();
-        context.setToken(authToken);
+                "API service is not available at " + baseUrl +
+                        ". Please ensure the application is running.");
     }
 
     @When("admin sends GET request to plant summary endpoint")
@@ -444,7 +451,7 @@ public class MayuravelApiSteps {
     public void theResponseContainsAppropriateErrorMessageAboutInvalidPagination() {
         Response currentResponse = context.getResponse();
         Assertions.assertEquals(400, currentResponse.getStatusCode(),
-            "Invalid pagination should return 400 status code");
+                "Invalid pagination should return 400 status code");
         String errorMessage = currentResponse.getBody().asString();
         Assertions.assertTrue(!errorMessage.isEmpty(), "Error message should be present");
     }
@@ -464,7 +471,7 @@ public class MayuravelApiSteps {
         Response currentResponse = context.getResponse();
         int actualStatus = currentResponse.getStatusCode();
         Assertions.assertTrue(actualStatus == status1 || actualStatus == status2,
-            "Status should be " + status1 + " or " + status2 + " but got " + actualStatus);
+                "Status should be " + status1 + " or " + status2 + " but got " + actualStatus);
     }
 
     @And("if status is {int} then default sorting is applied")
@@ -545,7 +552,7 @@ public class MayuravelApiSteps {
         int actualStatus = currentResponse.getStatusCode();
         // Accept 200, 404 (endpoint doesn't exist), or 405 (method not allowed)
         Assertions.assertTrue(actualStatus == expectedStatus || actualStatus == 404 || actualStatus == 405,
-            "Status should be " + expectedStatus + ", 404, or 405 but got " + actualStatus);
+                "Status should be " + expectedStatus + ", 404, or 405 but got " + actualStatus);
     }
 
     @And("the response contains export data or file")
@@ -562,7 +569,7 @@ public class MayuravelApiSteps {
     public void theOperationIsCompletedSuccessfully() {
         Response currentResponse = context.getResponse();
         Assertions.assertTrue(currentResponse.getStatusCode() >= 200 && currentResponse.getStatusCode() < 300,
-            "Operation should complete with success status code");
+                "Operation should complete with success status code");
     }
 
     @And("data consistency is maintained")
@@ -616,9 +623,9 @@ public class MayuravelApiSteps {
         params.put("size", String.valueOf(size));
 
         String[] endpoints = {
-            "/api/categories",
-            "/categories",
-            "/api/v1/categories"
+                "/api/categories",
+                "/categories",
+                "/api/v1/categories"
         };
 
         for (String endpoint : endpoints) {
@@ -644,9 +651,9 @@ public class MayuravelApiSteps {
         params.put("size", String.valueOf(size));
 
         String[] endpoints = {
-            "/api/plants",
-            "/plants",
-            "/api/v1/plants"
+                "/api/plants",
+                "/plants",
+                "/api/v1/plants"
         };
 
         for (String endpoint : endpoints) {
@@ -672,9 +679,9 @@ public class MayuravelApiSteps {
         params.put("size", String.valueOf(size));
 
         String[] endpoints = {
-            "/api/sales",
-            "/sales",
-            "/api/v1/sales"
+                "/api/sales",
+                "/sales",
+                "/api/v1/sales"
         };
 
         for (String endpoint : endpoints) {
@@ -694,5 +701,12 @@ public class MayuravelApiSteps {
 
     private void createMockPaginationResponse() {
         logger.info("Created mock pagination response for testing");
+        response = new io.restassured.builder.ResponseBuilder()
+                .setStatusCode(503)
+                .setHeader("Content-Type", "application/json")
+                .setBody(
+                        "{\"error\": \"Service Unavailable\", \"message\": \"Mock response due to connection failure\"}")
+                .build();
+        context.setResponse(response);
     }
 }

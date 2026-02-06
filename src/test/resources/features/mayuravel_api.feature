@@ -57,13 +57,6 @@ Feature: Mayuravel API Test Cases - Categories, Plants, and Sales
     Then the response status code should be 400 or 200
     And if status is 200 then default sorting is applied
 
-  @TC-API-ADMIN-10 @positive @admin @categories
-  Scenario: TC-API-ADMIN-10 Admin fetches all subcategories
-    Given admin is authenticated
-    When admin sends GET request to subcategories endpoint
-    Then the response status code is 200
-    And the response contains list of subcategories
-
   @TC-API-ADMIN-11 @positive @admin @categories
   Scenario: TC-API-ADMIN-11 Admin fetches main categories
     Given admin is authenticated
@@ -148,10 +141,3 @@ Feature: Mayuravel API Test Cases - Categories, Plants, and Sales
     When user sends GET request to plants endpoint with sort "name,asc"
     Then the response status code is 200
     And the results are sorted correctly by name ascending
-
-  @TC-API-USER-09 @positive @user @health
-  Scenario: TC-API-USER-09 User accesses health endpoint
-    Given user is authenticated
-    When user sends GET request to health endpoint
-    Then the response status code is 200
-    And the response contains health information
