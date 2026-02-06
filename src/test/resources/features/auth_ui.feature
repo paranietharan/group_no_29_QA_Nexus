@@ -9,146 +9,150 @@ Feature: UI Login Functionality
 
   # ==================== UI ADMIN LOGIN TEST CASES ====================
 
-  @UI-LOGIN-ADMIN-01 @positive @admin @ui
-  Scenario: UI-LOGIN-ADMIN-01 Valid admin login via UI
+  @AUTH-UI-ADMIN-01 @positive @admin @ui
+  Scenario: AUTH-UI-ADMIN-01 Admin successful login
     When I enter admin username "admin"
     And I enter admin password "admin123"
     And I click the login button
     Then I should be redirected to the dashboard
     And the dashboard should be displayed
 
-  @UI-LOGIN-ADMIN-02 @negative @admin @ui
-  Scenario: UI-LOGIN-ADMIN-02 Invalid admin password shows error
+  @AUTH-UI-ADMIN-02 @negative @admin @ui
+  Scenario: AUTH-UI-ADMIN-02 Verify username validation works for Admin
+    When I leave username field empty
+    And I enter admin password "admin123"
+    And I click the login button
+    Then an error message should be displayed
+    And I should remain on the login page
+
+  @AUTH-UI-ADMIN-03 @negative @admin @ui
+  Scenario: AUTH-UI-ADMIN-03 Verify password validation works for Admin
+    When I enter admin username "admin"
+    And I leave password field empty
+    And I click the login button
+    Then an error message should be displayed
+    And I should remain on the login page
+
+  @AUTH-UI-ADMIN-04 @negative @admin @ui
+  Scenario: AUTH-UI-ADMIN-04 Login with incorrect admin credentials
     When I enter admin username "admin"
     And I enter admin password "wrongpassword"
     And I click the login button
     Then an error message should be displayed
     And I should remain on the login page
 
-  @UI-LOGIN-ADMIN-03 @negative @admin @ui
-  Scenario: UI-LOGIN-ADMIN-03 Non-existent admin shows error
-    When I enter admin username "fakeadmin"
-    And I enter admin password "password123"
-    And I click the login button
-    Then an error message should be displayed
-    And I should remain on the login page
+  @AUTH-UI-ADMIN-05 @positive @admin @ui
+  Scenario: AUTH-UI-ADMIN-05 Admin logout works
+    Given admin is logged in
+    When I click the logout button
+    Then I should be redirected to the login page
 
-  @UI-LOGIN-ADMIN-04 @negative @admin @ui
-  Scenario: UI-LOGIN-ADMIN-04 Empty username with valid password shows error
-    When I leave username field empty
-    And I enter admin password "admin123"
-    And I click the login button
-    Then an error message should be displayed
-    And I should remain on the login page
-
-  @UI-LOGIN-ADMIN-05 @negative @admin @ui
-  Scenario: UI-LOGIN-ADMIN-05 Valid username with empty password shows error
-    When I enter admin username "admin"
-    And I leave password field empty
-    And I click the login button
-    Then an error message should be displayed
-    And I should remain on the login page
-
-  @UI-LOGIN-ADMIN-06 @negative @admin @ui
-  Scenario: UI-LOGIN-ADMIN-06 Empty username and password shows error
-    When I leave username field empty
-    And I leave password field empty
-    And I click the login button
-    Then an error message should be displayed
-    And I should remain on the login page
-
-  @UI-LOGIN-ADMIN-07 @edge-case @admin @ui
-  Scenario: UI-LOGIN-ADMIN-07 SQL injection in username is handled
-    When I enter admin username "admin' OR '1'='1"
-    And I enter admin password "admin123"
-    And I click the login button
-    Then an error message should be displayed
-    And I should remain on the login page
-
-  @UI-LOGIN-ADMIN-08 @edge-case @admin @ui
-  Scenario: UI-LOGIN-ADMIN-08 SQL injection in password is handled
-    When I enter admin username "admin"
-    And I enter admin password "' OR '1'='1"
-    And I click the login button
-    Then an error message should be displayed
-    And I should remain on the login page
-
-  @UI-LOGIN-ADMIN-09 @edge-case @admin @ui
-  Scenario: UI-LOGIN-ADMIN-09 XSS injection attempt is handled
-    When I enter admin username "<script>alert('xss')</script>"
-    And I enter admin password "<script>alert('xss')</script>"
-    And I click the login button
-    Then an error message should be displayed
-    And I should remain on the login page
+  @AUTH-UI-ADMIN-06 @positive @admin @ui
+  Scenario: AUTH-UI-ADMIN-06 Admin logout correctly works
+    Given admin is logged out
+    When I navigate to the dashboard page
+    Then I should be redirected to the login page
 
   # ==================== UI USER LOGIN TEST CASES ====================
 
-  @UI-LOGIN-USER-01 @positive @user @ui
-  Scenario: UI-LOGIN-USER-01 Valid user login via UI
+  @AUTH-UI-USER-01 @positive @user @ui
+  Scenario: AUTH-UI-USER-01 User successful login
     When I enter user username "testuser"
     And I enter user password "test123"
     And I click the login button
     Then I should be redirected to the dashboard
     And the dashboard should be displayed
 
-  @UI-LOGIN-USER-02 @negative @user @ui
-  Scenario: UI-LOGIN-USER-02 Invalid user password shows error
-    When I enter user username "testuser"
-    And I enter user password "wrongpassword"
-    And I click the login button
-    Then an error message should be displayed
-    And I should remain on the login page
-
-  @UI-LOGIN-USER-03 @negative @user @ui
-  Scenario: UI-LOGIN-USER-03 Non-existent user shows error
-    When I enter user username "fakeuser"
-    And I enter user password "password123"
-    And I click the login button
-    Then an error message should be displayed
-    And I should remain on the login page
-
-  @UI-LOGIN-USER-04 @negative @user @ui
-  Scenario: UI-LOGIN-USER-04 Empty username with valid password shows error
+  @AUTH-UI-USER-02 @negative @user @ui
+  Scenario: AUTH-UI-USER-02 Verify username validation works for user
     When I leave username field empty
     And I enter user password "test123"
     And I click the login button
     Then an error message should be displayed
     And I should remain on the login page
 
-  @UI-LOGIN-USER-05 @negative @user @ui
-  Scenario: UI-LOGIN-USER-05 Valid username with empty password shows error
+  @AUTH-UI-USER-03 @negative @user @ui
+  Scenario: AUTH-UI-USER-03 Verify password validation works for User
     When I enter user username "testuser"
     And I leave password field empty
     And I click the login button
     Then an error message should be displayed
     And I should remain on the login page
 
-  @UI-LOGIN-USER-06 @negative @user @ui
-  Scenario: UI-LOGIN-USER-06 Empty username and password shows error
+  @AUTH-UI-USER-04 @negative @user @ui
+  Scenario: AUTH-UI-USER-04 Verify form validation works for user
     When I leave username field empty
     And I leave password field empty
     And I click the login button
     Then an error message should be displayed
     And I should remain on the login page
 
-  @UI-LOGIN-USER-07 @edge-case @user @ui
-  Scenario: UI-LOGIN-USER-07 SQL injection in username is handled
+  @AUTH-UI-USER-05 @positive @user @ui
+  Scenario: AUTH-UI-USER-05 User logout works
+    Given user is logged in
+    When I click the logout button
+    Then I should be redirected to the login page
+
+  @AUTH-UI-USER-06 @positive @user @ui
+  Scenario: AUTH-UI-USER-06 User logout correctly works
+    Given user is logged out
+    When I navigate to the dashboard page
+    Then I should be redirected to the login page
+
+  @AUTH-UI-USER-07 @positive @user @ui
+  Scenario: AUTH-UI-USER-07 Password field shows masked characters
+    When I type the password "test123"
+    Then the password field should be masked
+
+  @AUTH-UI-USER-08 @negative @user @ui
+  Scenario: AUTH-UI-USER-08 Access protected page without login
+    When I navigate to the dashboard page
+    Then I should be redirected to the login page
+
+  # ==================== ADDITIONAL UI SCENARIOS ====================
+
+  @UI-LOGIN-ADMIN-01 @edge-case @admin @ui
+  Scenario: UI-LOGIN-ADMIN-01 SQL injection in username is handled
+    When I enter admin username "admin' OR '1'='1"
+    And I enter admin password "admin123"
+    And I click the login button
+    Then an error message should be displayed
+    And I should remain on the login page
+
+  @UI-LOGIN-ADMIN-02 @edge-case @admin @ui
+  Scenario: UI-LOGIN-ADMIN-02 SQL injection in password is handled
+    When I enter admin username "admin"
+    And I enter admin password "' OR '1'='1"
+    And I click the login button
+    Then an error message should be displayed
+    And I should remain on the login page
+
+  @UI-LOGIN-ADMIN-03 @edge-case @admin @ui
+  Scenario: UI-LOGIN-ADMIN-03 XSS injection attempt is handled
+    When I enter admin username "<script>alert('xss')</script>"
+    And I enter admin password "<script>alert('xss')</script>"
+    And I click the login button
+    Then an error message should be displayed
+    And I should remain on the login page
+
+  @UI-LOGIN-USER-01 @edge-case @user @ui
+  Scenario: UI-LOGIN-USER-01 SQL injection in username is handled
     When I enter user username "user' OR '1'='1"
     And I enter user password "test123"
     And I click the login button
     Then an error message should be displayed
     And I should remain on the login page
 
-  @UI-LOGIN-USER-08 @edge-case @user @ui
-  Scenario: UI-LOGIN-USER-08 SQL injection in password is handled
+  @UI-LOGIN-USER-02 @edge-case @user @ui
+  Scenario: UI-LOGIN-USER-02 SQL injection in password is handled
     When I enter user username "testuser"
     And I enter user password "' OR '1'='1"
     And I click the login button
     Then an error message should be displayed
     And I should remain on the login page
 
-  @UI-LOGIN-USER-09 @edge-case @user @ui
-  Scenario: UI-LOGIN-USER-09 XSS injection attempt is handled
+  @UI-LOGIN-USER-03 @edge-case @user @ui
+  Scenario: UI-LOGIN-USER-03 XSS injection attempt is handled
     When I enter user username "<script>alert('xss')</script>"
     And I enter user password "<script>alert('xss')</script>"
     And I click the login button

@@ -39,6 +39,16 @@ public class LoginPage extends BasePage {
         field.sendKeys(password);
     }
 
+    public boolean isPasswordMasked() {
+        try {
+            WebElement field = wait.until(ExpectedConditions.presenceOfElementLocated(passwordLocator));
+            String type = field.getAttribute("type");
+            return type != null && type.equalsIgnoreCase("password");
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public void clickLoginButton() {
         WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(loginButtonLocator));
         btn.click();
@@ -52,7 +62,7 @@ public class LoginPage extends BasePage {
 
     public boolean isErrorMessageDisplayed() {
         try {
-            // First check for general error messages
+            // First check for err msg
             WebElement error = wait.until(ExpectedConditions.visibilityOfElementLocated(errorMessageLocator));
             return error.isDisplayed();
         } catch (Exception e) {
@@ -68,7 +78,7 @@ public class LoginPage extends BasePage {
             if (!invalidInputs.isEmpty()) {
                 return true;
             }
-            // Check for invalid-feedback divs with non-empty text
+            // Check for invalid-feedback divs with no empty text
             java.util.List<WebElement> feedbacks = driver.findElements(validationFeedbackLocator);
             for (WebElement feedback : feedbacks) {
                 String text = feedback.getText();
