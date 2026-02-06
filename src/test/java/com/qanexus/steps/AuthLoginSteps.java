@@ -2,6 +2,7 @@ package com.qanexus.steps;
 
 import com.qanexus.api.ApiClient;
 import com.qanexus.api.AuthApi;
+import com.qanexus.api.Plant_Auth_client;
 import com.qanexus.support.TestContext;
 import com.qanexus.support.TestDataLoader;
 import io.cucumber.java.en.Given;
@@ -17,6 +18,7 @@ public class AuthLoginSteps {
     private final TestContext context = new TestContext();
     private final AuthApi authApi = new AuthApi();
     private final ApiClient apiClient = new ApiClient();
+    private final Plant_Auth_client plantAuthClient = new Plant_Auth_client();
 
     @Given("the authentication service is available")
     public void theAuthenticationServiceIsAvailable() {
@@ -91,6 +93,12 @@ public class AuthLoginSteps {
         context.setPassword("");
     }
 
+    @Given("credentials username {string} and password {string}")
+    public void credentialsUsernameAndPassword(String username, String password) {
+        context.setUsername(username);
+        context.setPassword(password);
+    }
+
     @Given("SQL injection payload in credentials")
     public void sqlInjectionPayloadInCredentials() {
         context.setUsername("admin' OR '1'='1");
@@ -138,6 +146,14 @@ public class AuthLoginSteps {
     public void iAccessTheCategoriesEndpointWithNonJwtToken() {
         Response response = apiClient.request()
                 .header("Authorization", "Bearer not-a-jwt")
+                .get("/api/categories");
+        context.setResponse(response);
+    }
+
+    @When("I access the categories endpoint with basic auth")
+    public void iAccessTheCategoriesEndpointWithBasicAuth() {
+        Response response = plantAuthClient.request()
+                .header("Authorization", "Basic dGVzdDp0ZXN0")
                 .get("/api/categories");
         context.setResponse(response);
     }
