@@ -168,6 +168,18 @@ Feature: Authentication API
     Then the response status code is 401
     And the response does not contain script tags
 
+  @AUTH-API-ADMIN-15 @negative @admin @api
+  Scenario: AUTH-API-ADMIN-15 Wrong token type (Basic) is rejected
+    When I access the categories endpoint with basic auth
+    Then the response status code is 401
+    And the response contains an error message
+
+  @AUTH-API-ADMIN-16 @negative @admin @api
+  Scenario: AUTH-API-ADMIN-16 Username case sensitivity for admin
+    Given credentials username "ADMIN" and password "admin123"
+    When the login request is sent
+    Then the response status code is 401
+
   @AUTH-API-USER-10 @negative @user @api
   Scenario: AUTH-API-USER-10 Non-existent user returns 401
     Given non-existent user credentials
@@ -200,4 +212,10 @@ Feature: Authentication API
     When the login request is sent
     Then the response status code is 401
     And the response does not contain script tags
+
+  @AUTH-API-USER-15 @negative @user @api
+  Scenario: AUTH-API-USER-15 Username case sensitivity for user
+    Given credentials username "TESTUSER" and password "test123"
+    When the login request is sent
+    Then the response status code is 401
 

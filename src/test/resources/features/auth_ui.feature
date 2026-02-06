@@ -135,6 +135,14 @@ Feature: UI Login Functionality
     Then an error message should be displayed
     And I should remain on the login page
 
+  @AUTH-UI-ADMIN-12 @negative @admin @ui
+  Scenario: AUTH-UI-ADMIN-12 Username case sensitivity for admin
+    When I enter admin username "ADMIN"
+    And I enter admin password "admin123"
+    And I click the login button
+    Then an error message should be displayed
+    And I should remain on the login page
+
   @AUTH-UI-USER-09 @edge-case @user @ui
   Scenario: AUTH-UI-USER-09 SQL injection in username is handled
     When I enter user username "user' OR '1'='1"
@@ -155,6 +163,14 @@ Feature: UI Login Functionality
   Scenario: AUTH-UI-USER-11 XSS injection attempt is handled
     When I enter user username "<script>alert('xss')</script>"
     And I enter user password "<script>alert('xss')</script>"
+    And I click the login button
+    Then an error message should be displayed
+    And I should remain on the login page
+
+  @AUTH-UI-USER-12 @negative @user @ui
+  Scenario: AUTH-UI-USER-12 Username case sensitivity for user
+    When I enter user username "TESTUSER"
+    And I enter user password "test123"
     And I click the login button
     Then an error message should be displayed
     And I should remain on the login page
