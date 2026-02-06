@@ -111,48 +111,48 @@ Feature: UI Login Functionality
 
   # ==================== ADDITIONAL UI SCENARIOS ====================
 
-  @UI-LOGIN-ADMIN-01 @edge-case @admin @ui
-  Scenario: UI-LOGIN-ADMIN-01 SQL injection in username is handled
+  @AUTH-UI-ADMIN-09 @edge-case @admin @ui
+  Scenario: AUTH-UI-ADMIN-09 SQL injection in username is handled
     When I enter admin username "admin' OR '1'='1"
     And I enter admin password "admin123"
     And I click the login button
     Then an error message should be displayed
     And I should remain on the login page
 
-  @UI-LOGIN-ADMIN-02 @edge-case @admin @ui
-  Scenario: UI-LOGIN-ADMIN-02 SQL injection in password is handled
+  @AUTH-UI-ADMIN-10 @edge-case @admin @ui
+  Scenario: AUTH-UI-ADMIN-10 SQL injection in password is handled
     When I enter admin username "admin"
     And I enter admin password "' OR '1'='1"
     And I click the login button
     Then an error message should be displayed
     And I should remain on the login page
 
-  @UI-LOGIN-ADMIN-03 @edge-case @admin @ui
-  Scenario: UI-LOGIN-ADMIN-03 XSS injection attempt is handled
+  @AUTH-UI-ADMIN-11 @edge-case @admin @ui
+  Scenario: AUTH-UI-ADMIN-11 XSS injection attempt is handled
     When I enter admin username "<script>alert('xss')</script>"
     And I enter admin password "<script>alert('xss')</script>"
     And I click the login button
     Then an error message should be displayed
     And I should remain on the login page
 
-  @UI-LOGIN-USER-01 @edge-case @user @ui
-  Scenario: UI-LOGIN-USER-01 SQL injection in username is handled
+  @AUTH-UI-USER-09 @edge-case @user @ui
+  Scenario: AUTH-UI-USER-09 SQL injection in username is handled
     When I enter user username "user' OR '1'='1"
     And I enter user password "test123"
     And I click the login button
     Then an error message should be displayed
     And I should remain on the login page
 
-  @UI-LOGIN-USER-02 @edge-case @user @ui
-  Scenario: UI-LOGIN-USER-02 SQL injection in password is handled
+  @AUTH-UI-USER-10 @edge-case @user @ui
+  Scenario: AUTH-UI-USER-10 SQL injection in password is handled
     When I enter user username "testuser"
     And I enter user password "' OR '1'='1"
     And I click the login button
     Then an error message should be displayed
     And I should remain on the login page
 
-  @UI-LOGIN-USER-03 @edge-case @user @ui
-  Scenario: UI-LOGIN-USER-03 XSS injection attempt is handled
+  @AUTH-UI-USER-11 @edge-case @user @ui
+  Scenario: AUTH-UI-USER-11 XSS injection attempt is handled
     When I enter user username "<script>alert('xss')</script>"
     And I enter user password "<script>alert('xss')</script>"
     And I click the login button

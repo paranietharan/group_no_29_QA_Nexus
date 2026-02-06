@@ -135,67 +135,67 @@ Feature: Authentication API
 
   # ==================== ADDITIONAL API SCENARIOS ====================
 
-  @AUTH-API-ADMIN-01 @negative @admin @api
-  Scenario: AUTH-API-ADMIN-01 Non-existent admin returns 401
+  @AUTH-API-ADMIN-10 @negative @admin @api
+  Scenario: AUTH-API-ADMIN-10 Non-existent admin returns 401
     Given non-existent admin credentials
     When the login request is sent
     Then the response status code is 401
 
-  @AUTH-API-ADMIN-02 @negative @admin @api
-  Scenario: AUTH-API-ADMIN-02 Empty username and password returns 401
+  @AUTH-API-ADMIN-11 @negative @admin @api
+  Scenario: AUTH-API-ADMIN-11 Empty username and password returns 401
     Given empty username and password
     When the login request is sent
     Then the response status code is 401
 
-  @AUTH-API-ADMIN-03 @edge-case @admin @api
-  Scenario: AUTH-API-ADMIN-03 SQL injection in username is rejected
+  @AUTH-API-ADMIN-12 @edge-case @admin @api
+  Scenario: AUTH-API-ADMIN-12 SQL injection in username is rejected
     Given SQL injection payload in username
     When the login request is sent
     Then the response status code is 401
     And the response does not contain error details
 
-  @AUTH-API-ADMIN-04 @edge-case @admin @api
-  Scenario: AUTH-API-ADMIN-04 SQL injection in password is rejected
+  @AUTH-API-ADMIN-13 @edge-case @admin @api
+  Scenario: AUTH-API-ADMIN-13 SQL injection in password is rejected
     Given SQL injection payload in password
     When the login request is sent
     Then the response status code is 401
     And the response does not contain error details
 
-  @AUTH-API-ADMIN-05 @edge-case @admin @api
-  Scenario: AUTH-API-ADMIN-05 XSS injection attempt is rejected
+  @AUTH-API-ADMIN-14 @edge-case @admin @api
+  Scenario: AUTH-API-ADMIN-14 XSS injection attempt is rejected
     Given XSS payload in credentials
     When the login request is sent
     Then the response status code is 401
     And the response does not contain script tags
 
-  @AUTH-API-USER-01 @negative @user @api
-  Scenario: AUTH-API-USER-01 Non-existent user returns 401
+  @AUTH-API-USER-10 @negative @user @api
+  Scenario: AUTH-API-USER-10 Non-existent user returns 401
     Given non-existent user credentials
     When the login request is sent
     Then the response status code is 401
 
-  @AUTH-API-USER-02 @negative @user @api
-  Scenario: AUTH-API-USER-02 Empty username and password returns 401
+  @AUTH-API-USER-11 @negative @user @api
+  Scenario: AUTH-API-USER-11 Empty username and password returns 401
     Given empty username and password
     When the login request is sent
     Then the response status code is 401
 
-  @AUTH-API-USER-03 @edge-case @user @api
-  Scenario: AUTH-API-USER-03 SQL injection in username is rejected
+  @AUTH-API-USER-12 @edge-case @user @api
+  Scenario: AUTH-API-USER-12 SQL injection in username is rejected
     Given SQL injection payload in username
     When the login request is sent
     Then the response status code is 401
     And the response does not contain error details
 
-  @AUTH-API-USER-04 @edge-case @user @api
-  Scenario: AUTH-API-USER-04 SQL injection in password is rejected
+  @AUTH-API-USER-13 @edge-case @user @api
+  Scenario: AUTH-API-USER-13 SQL injection in password is rejected
     Given SQL injection payload in password
     When the login request is sent
     Then the response status code is 401
     And the response does not contain error details
 
-  @AUTH-API-USER-05 @edge-case @user @api
-  Scenario: AUTH-API-USER-05 XSS injection attempt is rejected
+  @AUTH-API-USER-14 @edge-case @user @api
+  Scenario: AUTH-API-USER-14 XSS injection attempt is rejected
     Given XSS payload in credentials
     When the login request is sent
     Then the response status code is 401
