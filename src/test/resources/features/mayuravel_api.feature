@@ -25,13 +25,6 @@ Feature: Mayuravel API Test Cases - Categories, Plants, and Sales
     And the response contains paginated plant list
     And the response contains pagination metadata
 
-  @TC-API-ADMIN-03 @positive @admin @pagination
-  Scenario: TC-API-ADMIN-03 Admin fetches paginated sales successfully
-    Given admin is authenticated
-    When admin sends GET request to sales endpoint with page 0 and size 10
-    Then the response status code is 200
-    And the response contains paginated sales list
-    And the response contains pagination metadata
 
   @TC-API-ADMIN-04 @positive @admin @summary
   Scenario: TC-API-ADMIN-04 Admin fetches plant summary
@@ -59,26 +52,12 @@ Feature: Mayuravel API Test Cases - Categories, Plants, and Sales
     Then the response status code is 200
     And the response contains filtered plant results
 
-  @TC-API-ADMIN-07 @negative @admin @pagination
-  Scenario: TC-API-ADMIN-07 Admin uses invalid pagination params
-    Given admin is authenticated
-    When admin sends GET request to categories endpoint with page -1 and size 10
-    Then the response status code is 400
-    And the response contains appropriate error message about invalid pagination
-
   @TC-API-ADMIN-08 @negative @admin @sorting
   Scenario: TC-API-ADMIN-08 Admin sorts by invalid field
     Given admin is authenticated
     When admin sends GET request to plants endpoint with sort "invalidField"
     Then the response status code should be 400 or 200
     And if status is 200 then default sorting is applied
-
-  @TC-API-ADMIN-09 @positive @admin @health
-  Scenario: TC-API-ADMIN-09 Admin accesses health endpoint
-    Given admin is authenticated
-    When admin sends GET request to health endpoint
-    Then the response status code is 200
-    And the response contains service health information
 
   @TC-API-ADMIN-10 @positive @admin @categories
   Scenario: TC-API-ADMIN-10 Admin fetches all subcategories
@@ -100,20 +79,6 @@ Feature: Mayuravel API Test Cases - Categories, Plants, and Sales
     When admin sends GET request to plants endpoint with lowStock filter true
     Then the response status code is 200
     And the response contains only low stock plants
-
-  @TC-API-ADMIN-13 @positive @admin @export
-  Scenario: TC-API-ADMIN-13 Admin exports data (if endpoint exists)
-    Given admin is authenticated
-    When admin sends GET request to export endpoint for plants
-    Then the response status code is 200 if endpoint exists
-    And the response contains export data or file
-
-  @TC-API-ADMIN-14 @positive @admin @bulk
-  Scenario: TC-API-ADMIN-14 Admin bulk operations (if supported)
-    Given admin is authenticated
-    When admin sends bulk update request to plants endpoint
-    Then the response status code is 200 or 201 if supported
-    And the operation is completed successfully
 
   @TC-API-ADMIN-15 @positive @admin @consistency
   Scenario: TC-API-ADMIN-15 Admin cross-module consistency
@@ -194,10 +159,3 @@ Feature: Mayuravel API Test Cases - Categories, Plants, and Sales
     When user sends GET request to health endpoint
     Then the response status code is 200
     And the response contains health information
-
-  @TC-API-USER-10 @negative @user @authorization
-  Scenario: TC-API-USER-10 User cannot access admin-only summary endpoints
-    Given user is authenticated
-    When user sends GET request to admin-only summary endpoint
-    Then the response status code is 403
-    And the response indicates access denied

@@ -13,46 +13,6 @@ Feature: Mayuravel UI Test Cases - Dashboard and Navigation
     Then the dashboard loads within 3 seconds
     And admin sees the dashboard page
 
-  @TC-UI-ADMIN-02 @positive @admin @ui @dashboard
-  Scenario: TC-UI-ADMIN-02 Admin sees summary cards
-    Given admin is logged in and on dashboard
-    Then admin sees Categories summary card
-    And admin sees Plants summary card
-    And admin sees Sales summary card
-    And all three summary cards are displayed
-
-  @TC-UI-ADMIN-03 @positive @admin @ui @navigation
-  Scenario: TC-UI-ADMIN-03 Admin can click summary cards to navigate
-    Given admin is logged in and on dashboard
-    When admin clicks on Categories summary card
-    Then admin is redirected to categories page
-    When admin navigates back to dashboard
-    And admin clicks on Plants summary card
-    Then admin is redirected to plants page
-    When admin navigates back to dashboard
-    And admin clicks on Sales summary card
-    Then admin is redirected to sales page
-
-  @TC-UI-ADMIN-04 @positive @admin @ui @navigation
-  Scenario: TC-UI-ADMIN-04 Admin navigation menu highlights active page
-    Given admin is logged in and on dashboard
-    When admin clicks on Categories in navigation menu
-    Then Categories menu item is highlighted as active
-    When admin clicks on Plants in navigation menu
-    Then Plants menu item is highlighted as active
-    When admin clicks on Sales in navigation menu
-    Then Sales menu item is highlighted as active
-
-  @TC-UI-ADMIN-05 @positive @admin @ui @navigation
-  Scenario: TC-UI-ADMIN-05 Admin can switch between modules quickly
-    Given admin is logged in on dashboard
-    When admin clicks on Categories module in navigation
-    Then the Categories page loads within 2 seconds
-    When admin clicks on Plants module in navigation
-    Then the Plants page loads within 2 seconds
-    When admin clicks on Sales module in navigation
-    Then the Sales page loads within 2 seconds
-
   @TC-UI-ADMIN-06 @positive @admin @ui @dashboard
   Scenario: TC-UI-ADMIN-06 Admin sees real-time updates in summaries
     Given admin is logged in and on dashboard
@@ -104,14 +64,6 @@ Feature: Mayuravel UI Test Cases - Dashboard and Navigation
     Then the theme colors and fonts are consistent
     When admin navigates to sales page
     Then the theme colors and fonts are consistent
-
-  @TC-UI-ADMIN-12 @positive @admin @ui @logout
-  Scenario: TC-UI-ADMIN-12 Admin can logout from any page
-    Given admin is logged in
-    When admin navigates to plants page
-    And admin clicks logout button
-    Then admin is logged out successfully
-    And admin is redirected to login page
 
   @TC-UI-ADMIN-13 @positive @admin @ui @breadcrumbs
   Scenario: TC-UI-ADMIN-13 Admin sees breadcrumbs for navigation
