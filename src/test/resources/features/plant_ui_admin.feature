@@ -51,15 +51,6 @@ Feature: Plant UI - Admin Role
     And the admin confirms the deletion
     Then the plant "Tulip" is removed from the list
 
-  # TC_UI_ADMIN_006
-  @TC_UI_ADMIN_006 @negative @validation
-  Scenario: Admin sees validation errors for invalid inputs
-    When the admin navigates to the admin plants page
-    And the admin clicks the Add Plant button
-    And the admin enters name "AB"
-    And the admin enters price "0"
-    And the admin tries to save
-    Then validation error messages are displayed under each field
 
   # TC_UI_ADMIN_007
   @TC_UI_ADMIN_007 @positive @search

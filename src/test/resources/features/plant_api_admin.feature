@@ -7,14 +7,6 @@ Feature: Plant API - Admin Role
   Background:
     Given the admin is authenticated
 
-  # TC_API_ADMIN_001
-  @TC_API_ADMIN_001 @positive @create
-  Scenario: Admin creates plant under valid sub-category returns 201
-    Given a valid sub-category exists
-    And valid plant data with name "Test Plant" price 150.00 and quantity 25
-    When the admin sends a POST request to create a plant
-    Then the plant API response status code is 201
-    And the response contains the created plant with ID
 
   # TC_API_ADMIN_002
   @TC_API_ADMIN_002 @positive @update

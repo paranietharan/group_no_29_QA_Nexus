@@ -36,9 +36,21 @@ public class PlantFormPage extends BasePage {
     }
 
     public void enterPrice(String price) {
-        WebElement input = wait.until(ExpectedConditions.presenceOfElementLocated(priceInput));
-        input.clear();
-        input.sendKeys(price);
+        try {
+            // Check if we're on the form page
+            String currentUrl = driver.getCurrentUrl();
+            System.out.println("Current URL: " + currentUrl);
+            if (!currentUrl.contains("/plants/edit/") && !currentUrl.contains("/plants/add")) {
+                System.out.println("WARNING: Not on plant form page!");
+            }
+            
+            WebElement input = wait.until(ExpectedConditions.presenceOfElementLocated(priceInput));
+            input.clear();
+            input.sendKeys(price);
+        } catch (Exception e) {
+            System.out.println("Failed to enter price: " + e.getMessage());
+            throw e;
+        }
     }
 
     public void enterQuantity(String quantity) {
@@ -56,7 +68,39 @@ public class PlantFormPage extends BasePage {
     public void selectCategoryByIndex(int index) {
         WebElement dropdown = wait.until(ExpectedConditions.presenceOfElementLocated(categoryDropdown));
         Select select = new Select(dropdown);
-        select.selectByIndex(index);
+        List<WebElement> options = select.getOptions();
+        // Find first option that's not a placeholder (has a non-empty value)
+        if (options.size() > 1) {
+            for (int i = 1; i < options.size(); i++) {
+                String value = options.get(i).getAttribute("value");
+                if (value != null && !value.isEmpty()) {
+                    select.selectByIndex(i);
+                    return;
+                }
+            }
+        }
+        // If no valid option found, try the requested index anyway
+        if (index < options.size()) {
+            select.selectByIndex(index);
+        }
+    }
+
+    public boolean hasSelectableCategories() {
+        try {
+            WebElement dropdown = wait.until(ExpectedConditions.presenceOfElementLocated(categoryDropdown));
+            Select select = new Select(dropdown);
+            List<WebElement> options = select.getOptions();
+            // Check if there's at least one non-placeholder option
+            for (int i = 1; i < options.size(); i++) {
+                String value = options.get(i).getAttribute("value");
+                if (value != null && !value.isEmpty()) {
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public void clickSave() {

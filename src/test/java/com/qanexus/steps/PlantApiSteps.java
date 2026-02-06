@@ -64,6 +64,7 @@ public class PlantApiSteps {
                 if (category != null) {
                     categoryId = Long.valueOf(category.get("id").toString());
                 }
+                System.out.println("Using existing plant ID: " + plantId);
                 return;
             }
         }
@@ -73,11 +74,8 @@ public class PlantApiSteps {
         if (adminLogin.statusCode() == 200) {
             String adminToken = adminLogin.jsonPath().getString("token");
 
-            // Get category from existing plants or use default
-            Long subCatId = getCategoryIdFromExistingPlants(adminToken);
-            if (subCatId == null) {
-                subCatId = 2L; // Default sub-category ID (Roses)
-            }
+            // Use default sub-category ID
+            Long subCatId = 2L; // Default sub-category ID (Roses)
 
             // Create plant under sub-category
             Response created = plantApi.createPlant(adminToken, subCatId,
@@ -127,14 +125,19 @@ public class PlantApiSteps {
             "TestPlant" + System.currentTimeMillis(), 100.0, 10);
         if (response.statusCode() == 201) {
             plantId = response.jsonPath().getLong("id");
+            System.out.println("Created plant: ID=" + plantId);
         } else {
             // Fallback: fetch existing plant
             Response plants = plantApi.getAllPlants(context.getToken());
-            List<Map<String, Object>> plantList = plants.jsonPath().getList("");
-            if (!plantList.isEmpty()) {
-                plantId = Long.valueOf(plantList.get(0).get("id").toString());
+            if (plants.statusCode() == 200) {
+                List<Map<String, Object>> plantList = plants.jsonPath().getList("");
+                if (plantList != null && !plantList.isEmpty()) {
+                    plantId = Long.valueOf(plantList.get(0).get("id").toString());
+                    System.out.println("Using existing plant: ID=" + plantId);
+                }
             }
         }
+        assertNotNull(plantId, "Failed to create or find plant");
     }
 
     @Given("a category with ID {int} exists with plants")
@@ -201,7 +204,25 @@ public class PlantApiSteps {
         if (response.statusCode() == 201) {
             plantId = response.jsonPath().getLong("id");
             createdPlantId = plantId;
+            System.out.println("Created plant for update: ID=" + plantId);
+        } else {
+            // Try to use existing plant
+            Response plants = plantApi.getAllPlants(context.getToken());
+            if (plants.statusCode() == 200) {
+                List<Map<String, Object>> plantList = plants.jsonPath().getList("");
+                if (plantList != null && !plantList.isEmpty()) {
+                    plantId = Long.valueOf(plantList.get(0).get("id").toString());
+                    originalPlantName = plantList.get(0).get("name").toString();
+                    originalQuantity = ((Number) plantList.get(0).get("quantity")).intValue();
+                    Map<String, Object> cat = (Map<String, Object>) plantList.get(0).get("category");
+                    if (cat != null) {
+                        originalCategoryId = Long.valueOf(cat.get("id").toString());
+                    }
+                    System.out.println("Using existing plant for update: ID=" + plantId);
+                }
+            }
         }
+        assertNotNull(plantId, "Failed to create or find plant for update test");
     }
 
     @Given("updated plant data with price {double}")
@@ -217,7 +238,19 @@ public class PlantApiSteps {
         if (response.statusCode() == 201) {
             plantId = response.jsonPath().getLong("id");
             createdPlantId = plantId;
+            System.out.println("Created plant for delete: ID=" + plantId);
+        } else {
+            // Try to use existing plant
+            Response plants = plantApi.getAllPlants(context.getToken());
+            if (plants.statusCode() == 200) {
+                List<Map<String, Object>> plantList = plants.jsonPath().getList("");
+                if (plantList != null && !plantList.isEmpty()) {
+                    plantId = Long.valueOf(plantList.get(0).get("id").toString());
+                    System.out.println("Using existing plant for delete: ID=" + plantId);
+                }
+            }
         }
+        assertNotNull(plantId, "Failed to create or find plant for delete test");
     }
 
     @Given("plant data with negative quantity {int}")
