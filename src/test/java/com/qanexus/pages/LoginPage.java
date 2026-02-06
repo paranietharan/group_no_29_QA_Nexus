@@ -56,7 +56,7 @@ public class LoginPage extends BasePage {
             WebElement error = wait.until(ExpectedConditions.visibilityOfElementLocated(errorMessageLocator));
             return error.isDisplayed();
         } catch (Exception e) {
-            // Check for validation feedback (invalid-feedback divs with text)
+            // Check for validation feedback
             return isValidationMessageDisplayed();
         }
     }
