@@ -17,7 +17,6 @@ Feature: Category API Management - Admin
 
   @TC_API_CAT_ADMIN_02 @positive
   Scenario: Admin creates sub-category
-    #And a main category "Dahlia" exist
     When admin sends POST request to "/api/categories" with sub-category "RedRo" under parent
     Then the response status code is 201
     And the response contains category with name "RedRo"
@@ -45,7 +44,6 @@ Feature: Category API Management - Admin
 
   @TC_API_CAT_ADMIN_06 @negative
   Scenario: Admin creates duplicate category
-    #And a main category "Orchid" exists
     When admin attempts to create duplicate category "Orchid" with same parent
     Then the response status code is 400
     And the response contains error message about duplicate
@@ -83,7 +81,6 @@ Feature: Category API Management - Admin
 
   @TC_API_CAT_ADMIN_12 @positive
   Scenario: Admin searches categories by name
-    #And categories "Rose", "Roses", "Red" exist
     When admin sends GET request with search parameter "Rose"
     Then the response status code is 200
     And the response contains categories matching "Rose"

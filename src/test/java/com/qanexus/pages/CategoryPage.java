@@ -141,28 +141,26 @@ public class CategoryPage extends BasePage {
 
     public void submitCategoryForm() {
         click(submitButton);
-        // Wait for redirect after form submission
         try {
-            Thread.sleep(2000); // Allow time for POST and redirect
+            Thread.sleep(2000); 
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
-        waitForPageLoad(); // Wait for new page to load
+        waitForPageLoad();
     }
 
     public void cancelCategoryForm() {
         click(cancelButton);
     }
 
-    public void search(String searchTerm) {
-        // Clear search box first, then type and submit
+    public void search(String searchTerm) {       
         searchBox.clear();
         wait.until(ExpectedConditions.visibilityOf(searchBox));
         type(searchBox, searchTerm);
         wait.until(ExpectedConditions.attributeToBeNotEmpty(searchBox, "value"));
-        applyFilter(); // Use the filter button instead of Enter
+        applyFilter();
         try {
-            Thread.sleep(1000); // Wait for results to filter
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -196,15 +194,12 @@ public class CategoryPage extends BasePage {
     }
 
     public void clickEditCategory(String categoryName) {
-        try {
-            // First search for the category to ensure it's visible
+        try {            
             search(categoryName);
             waitForPageLoad();
 
-            // Find the row containing the category name
             WebElement categoryRow = wait.until(ExpectedConditions.presenceOfElementLocated(
-                    By.xpath("//tr[.//td[contains(normalize-space(.), '" + categoryName + "')]]")));
-            // Within that row, find the edit button
+                    By.xpath("//tr[.//td[contains(normalize-space(.), '" + categoryName + "')]]")));            
             WebElement editButton = categoryRow.findElement(By.cssSelector("a.btn-outline-primary"));
             click(editButton);
         } catch (NoSuchElementException e) {
@@ -266,8 +261,8 @@ public class CategoryPage extends BasePage {
         }
     }
 
-    public void clickEditButtonForCategory(String categoryName) { // Search first to ensure category is visible in
-                                                                  // paginated table
+    public void clickEditButtonForCategory(String categoryName) { 
+                                                                  
         search(categoryName);
         waitForPageLoad();
         wait.withTimeout(java.time.Duration.ofSeconds(15));
@@ -279,8 +274,8 @@ public class CategoryPage extends BasePage {
         click(editBtn);
     }
 
-    public void clickDeleteButtonForCategory(String categoryName) { // Search first to ensure category is visible in
-                                                                    // paginated table
+    public void clickDeleteButtonForCategory(String categoryName) { 
+                                                                    
         search(categoryName);
         waitForPageLoad();
         wait.withTimeout(java.time.Duration.ofSeconds(15));
@@ -293,28 +288,22 @@ public class CategoryPage extends BasePage {
     }
 
     public void clickDeleteCategory(String categoryName) {
-        try {
-            // First search for the category to ensure it's visible
+        try {            
             search(categoryName);
             waitForPageLoad();
 
-            // Find the row with the category, then find delete button within that row
             WebElement categoryRow = wait.until(ExpectedConditions.presenceOfElementLocated(
                     By.xpath("//tr[.//td[contains(normalize-space(.), '" + categoryName + "')]]")));
             WebElement deleteButton = categoryRow.findElement(By.cssSelector("button.btn-outline-danger"));
-            // DELETE button is a form submit button that triggers browser confirm()
             click(deleteButton);
 
-            // Handle browser confirm dialog
             try {
-                Thread.sleep(500); // Brief wait for confirm to appear
+                Thread.sleep(500); 
                 org.openqa.selenium.Alert alert = driver.switchTo().alert();
-                alert.accept(); // Click OK on the confirm dialog
+                alert.accept(); 
             } catch (Exception e) {
-                // No alert present, continue
-            }
+                }
 
-            // Wait for page to reload after delete
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -335,10 +324,7 @@ public class CategoryPage extends BasePage {
     }
 
     public boolean isModalDisplayed() {
-        // NOTE: App uses browser confirm(), not Bootstrap modal
-        // This method is kept for compatibility but will always return false
         try {
-            // Check if browser alert is present instead
             org.openqa.selenium.Alert alert = driver.switchTo().alert();
             return true;
         } catch (Exception e) {
@@ -347,12 +333,9 @@ public class CategoryPage extends BasePage {
     }
 
     public void confirmDelete() {
-        // NOTE: App uses browser confirm(), not Bootstrap modal
-        // Handle browser alert instead
         try {
             org.openqa.selenium.Alert alert = driver.switchTo().alert();
             alert.accept();
-            // Wait for page reload
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
@@ -382,12 +365,9 @@ public class CategoryPage extends BasePage {
     }
 
     public void waitForPageLoad() {
-        // Wait for page to be in stable state
         try {
-            // First wait for any navigation to complete
             Thread.sleep(1000);
 
-            // Then wait for one of the expected elements
             wait.until(ExpectedConditions.or(
                     ExpectedConditions.presenceOfElementLocated(By.cssSelector("table.table")),
                     ExpectedConditions.presenceOfElementLocated(By.xpath("//tbody")),
@@ -395,7 +375,6 @@ public class CategoryPage extends BasePage {
                     ExpectedConditions.presenceOfElementLocated(
                             By.xpath("//td[contains(normalize-space(.),'No category found')]"))));
 
-            // Additional wait for dynamic content to settle
             Thread.sleep(500);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();

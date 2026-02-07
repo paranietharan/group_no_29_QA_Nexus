@@ -55,8 +55,7 @@ Feature: Category UI Management - Admin
     And admin confirms the deletion in modal
     Then the category "Carnatio48" is removed from the list
     And the confirmation modal disappears
-  # SKIP: Application does not display validation errors on UI (DOM confirmed missing error block)
-
+  
   @TC_UI_CAT_ADMIN_07 @negative
   Scenario: Admin sees validation error for short name
     When admin navigates to "/ui/categories"
@@ -65,8 +64,7 @@ Feature: Category UI Management - Admin
     And admin submits the category form
     Then a red error message is displayed
     And the form is not submitted
-  # SKIP: Application does not display validation errors on UI (DOM confirmed missing error block)
-
+  
   @TC_UI_CAT_ADMIN_08 @negative
   Scenario: Admin sees validation error for long name
     When admin navigates to "/ui/categories"
