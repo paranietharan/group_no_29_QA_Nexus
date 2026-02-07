@@ -107,6 +107,13 @@ public class UILoginSteps {
         driver.get(config.getUiBaseUrl() + "/ui/dashboard");
     }
 
+    @When("I press the browser back button")
+    public void iPressTheBrowserBackButton() {
+        driver.navigate().back();
+        // Refresh the page to ensure any session changes are reflected
+        driver.navigate().refresh();
+    }
+
     @When("I type the password {string}")
     public void iTypeThePassword(String password) {
         loginPage.enterPassword(password);
@@ -151,6 +158,15 @@ public class UILoginSteps {
 
     @Then("I should remain on the login page")
     public void iShouldRemainOnTheLoginPage() {
+        try {
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            wait.until(ExpectedConditions.or(
+                ExpectedConditions.urlContains("/ui/login"),
+                ExpectedConditions.presenceOfElementLocated(org.openqa.selenium.By.cssSelector("input[name='username']"))
+            ));
+        } catch (Exception e) {
+            // Wait best-effort; assertion below will fail if not on login
+        }
         String currentUrl = driver.getCurrentUrl();
         assertTrue(currentUrl.contains("login"), "Should remain on login page. Current URL: " + currentUrl);
     }
