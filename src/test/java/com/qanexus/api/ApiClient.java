@@ -7,13 +7,10 @@ import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 public class ApiClient {
-    private static final Logger logger = LoggerFactory.getLogger(ApiClient.class);
     private final EnvConfig config = EnvConfig.getInstance();
 
     public RequestSpecification request() {
