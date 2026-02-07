@@ -601,6 +601,10 @@ public int extractStockFromOptionText(String optionText) {
 }
 
 public void selectPlantByPartialName(String plantName) {
+    // wait for the dropdown to be present and visible to avoid race conditions
+    new org.openqa.selenium.support.ui.WebDriverWait(driver, java.time.Duration.ofSeconds(8))
+            .until(org.openqa.selenium.support.ui.ExpectedConditions.visibilityOfElementLocated(plantDropdown));
+
     org.openqa.selenium.WebElement dropdown = driver.findElement(plantDropdown);
     org.openqa.selenium.support.ui.Select select = new org.openqa.selenium.support.ui.Select(dropdown);
 

@@ -88,7 +88,7 @@ Scenario: TC_UI_SALES_ADMIN_03 Quantity validation against stock
 
 
 @ui @sales @admin
-Scenario: TC_UI_SALES_ADMIN_05 Delete sale with confirmation
+Scenario: TC_UI_SALES_ADMIN_04 Delete sale with confirmation
   Given I login to the application as "ADMIN"
   When I access the Sales page via direct URL
   And I click Delete on any sale record
@@ -100,21 +100,21 @@ Then Sale record should be removed after confirmation
 
 
 @ui @sales @admin
-Scenario: TC_UI_SALES_ADMIN_06 Default sorting by sold date
+Scenario: TC_UI_SALES_ADMIN_05 Default sorting by sold date
   Given I login to the application as "ADMIN"
   When I access the Sales page via direct URL
   Then Sales records should be sorted by Sold Date in descending order
 
 
 @ui @sales @admin
-Scenario: TC_UI_SALES_ADMIN_07 No sales message display
+Scenario: TC_UI_SALES_ADMIN_06 No sales message display
   Given I login to the application as "ADMIN"
   When I access the Sales page via direct URL
   Then No sales found message should be displayed for ADMIN
 
 
 @ui @sales @admin
-Scenario: TC_UI_SALES_ADMIN_08 Cancel Sell Plant form
+Scenario: TC_UI_SALES_ADMIN_07 Cancel Sell Plant form
   Given I login to the application as "ADMIN"
   When I access the Sales page via direct URL
   When I open the Sell Plant form
@@ -123,7 +123,7 @@ Then Admin should be redirected back to Sales list page without saving sale
 
 
 @ui @sales @admin
-Scenario: TC_UI_SALES_ADMIN_09 Stock update after sale
+Scenario: TC_UI_SALES_ADMIN_08 Stock update after sale
   Given I login to the application as "ADMIN"
   When I access the Sales page via direct URL
   And I sell a plant using the Sell Plant form and note stock change

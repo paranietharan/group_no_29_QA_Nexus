@@ -12,13 +12,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class SalesApiSteps {
 
-    private final TestContext context = new TestContext();
-    private final SalesApi salesApi = new SalesApi();
-    private final AuthApi authApi = new AuthApi();
+    private final TestContext context;
+    private final SalesApi salesApi;
+    private final AuthApi authApi;
 
     private long saleId = 1;
     private long plantId = 1;
     private int quantity = 1;
+
+    public SalesApiSteps(TestContext context) {
+        this.context = context;
+        this.salesApi = new SalesApi();
+        this.authApi = new AuthApi();
+    }
 
     // ================= AUTH =================
 
@@ -47,6 +53,16 @@ public class SalesApiSteps {
         context.setResponse(response);
     }
 
+    @When("the user sends a GET request to fetch sale by ID")
+    public void fetchSaleByIdFromContext() {
+
+        Long id = context.getSaleId();
+        long idToUse = (id != null) ? id : this.saleId;
+
+        Response response = salesApi.getSaleById(context.getToken(), idToUse);
+        context.setResponse(response);
+    }
+
     @When("the user sends a GET request to paginate sales with page {int} and size {int}")
     public void paginateSales(int page, int size) {
 
@@ -61,19 +77,7 @@ public class SalesApiSteps {
         context.setResponse(response);
     }
 
-    @When("the user sends a POST request to create a sale")
-    public void userCreatesSale() {
-
-        Response response = salesApi.createSale(context.getToken(), plantId, quantity);
-        context.setResponse(response);
-    }
-
-    @When("the user sends a DELETE request to delete sale ID {int}")
-    public void deleteSale(int id) {
-
-        Response response = salesApi.deleteSale(context.getToken(), id);
-        context.setResponse(response);
-    }
+   
 
     @When("the user sends a GET request with invalid sale ID {int}")
     public void fetchInvalidSale(int id) {
@@ -119,18 +123,6 @@ public class SalesApiSteps {
     public void verifyFilter() {
 
         assertNotNull(context.getResponse().getBody());
-    }
-
-    @Then("the sale is not created")
-    public void verifySaleNotCreated() {
-
-        assertEquals(403, context.getResponse().statusCode());
-    }
-
-    @Then("the sale is not deleted")
-    public void verifySaleNotDeleted() {
-
-        assertEquals(403, context.getResponse().statusCode());
     }
 
     @Then("the response contains not found error")

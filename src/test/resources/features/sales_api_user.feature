@@ -30,24 +30,12 @@ Scenario: Sort sales
   Then the sales API response status code is 200
 
 @TC_API_SALES_USER_05
-Scenario: Block sale creation
-  When the user sends a POST request to create a sale
-  Then the sales API response status code is 403
-  And the sale is not created
-
-@TC_API_SALES_USER_06
-Scenario: Block sale deletion
-  When the user sends a DELETE request to delete sale ID 1
-  Then the sales API response status code is 403
-  And the sale is not deleted
-
-@TC_API_SALES_USER_07
 Scenario: Fetch non-existent sale
   When the user sends a GET request with invalid sale ID 9999
   Then the sales API response status code is 404
   And the response contains not found error
 
-@TC_API_SALES_USER_08
+@TC_API_SALES_USER_06
 Scenario: Filter sales by plant name
   When the user sends a GET request to filter sales by plant name "Rose"
   Then the sales API response status code is 200

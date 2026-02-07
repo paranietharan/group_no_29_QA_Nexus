@@ -59,6 +59,11 @@ public class SalesApiAdminSteps {
         context.setSaleId(saleId);
     }
 
+    @Given("a valid sale exists")
+    public void aValidSaleExists() {
+        anExistingSaleRecordIsAvailable();
+    }
+
     // ================= ACTIONS (TCs) =================
 
     // TC_API_SALES_ADMIN_03 Fetch all sales
@@ -93,6 +98,13 @@ public class SalesApiAdminSteps {
         context.setResponse(res);
     }
 
+    // Backwards-compatible step that matches feature text using 'invalid sale ID {int}'
+    @When("the admin sends a DELETE request with invalid sale ID {int}")
+    public void adminDeleteWithInvalidSaleId(int invalidId) {
+        Response res = salesApi.deleteSale(context.getToken(), (long) invalidId);
+        context.setResponse(res);
+    }
+
     // TC_API_SALES_ADMIN_14 Paginate sales
     @When("the admin requests paginated sales sorted by soldAt desc")
     public void adminPaginateSalesSortedBySoldAtDesc() {
@@ -100,10 +112,24 @@ public class SalesApiAdminSteps {
         context.setResponse(res);
     }
 
+    // Backwards-compatible admin step matching feature text for pagination
+    @When("the admin sends a GET request to paginate sales with page {int} and size {int}")
+    public void adminPaginateSales(int page, int size) {
+        Response res = salesApi.getSalesPaged(context.getToken(), page, size);
+        context.setResponse(res);
+    }
+
     // TC_API_SALES_ADMIN_15 Sort sales (same endpoint usage)
     @When("the admin requests sales sorted by soldAt desc")
     public void adminSortSalesBySoldAtDesc() {
         Response res = salesApi.getSalesPageSorted(context.getToken(), "soldAt,desc");
+        context.setResponse(res);
+    }
+
+    // Backwards-compatible admin step matching feature text for sorting
+    @When("the admin sends a GET request to sort sales by {string}")
+    public void adminSortSalesBy(String sort) {
+        Response res = salesApi.getSalesSorted(context.getToken(), sort);
         context.setResponse(res);
     }
 
@@ -142,6 +168,11 @@ public class SalesApiAdminSteps {
         // After DELETE 204, verify it's gone (GET should be 404)
         Response check = salesApi.getSaleById(context.getToken(), saleId);
         assertEquals(404, check.statusCode(), "Sale still exists after delete");
+    }
+
+    @Then("the sale is deleted successfully")
+    public void theSaleIsDeletedSuccessfully() {
+        verifySaleDeleted();
     }
 
     @Then("paginated sales data should be returned")
