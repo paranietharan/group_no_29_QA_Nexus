@@ -19,6 +19,7 @@ public class TestContext {
     private String userRole;
     private int currentPage;
     private int pageSize;
+    private Long saleId;
 
     public String getUsername() {
         return username;
@@ -131,5 +132,13 @@ public class TestContext {
 
     public void setPlantName(String plantName) {
         this.plantName = plantName;
+    }
+
+    public Long getSaleId() {
+        return saleId;
+    }
+
+    public void setSaleId(Long saleId) {
+        this.saleId = saleId;
     }
 }
