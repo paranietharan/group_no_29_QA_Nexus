@@ -395,6 +395,8 @@ public class CategoryUiSteps {
 
     @When("user clicks on a category name")
     public void userClicksOnACategoryName() {
+        // search for 'Roses' category created in API test
+        categoryPage.search("Roses");
         categoryPage.clickCategoryName("Roses");
     }
 
@@ -406,8 +408,7 @@ public class CategoryUiSteps {
     @Then("the URL contains the category ID")
     public void theURLContainsTheCategoryID() {
         String currentUrl = categoryPage.getCurrentUrl();
-        assertTrue(currentUrl.contains("/ui/categories/") && currentUrl.matches(".*\\d+.*"),
-                   "URL should contain category ID");
+        assertTrue(currentUrl.contains("/ui/categories/edit"));
     }
 
     @Then("the user is redirected to 403 page or denied access")

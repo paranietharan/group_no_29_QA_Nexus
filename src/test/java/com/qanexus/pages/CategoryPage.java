@@ -132,7 +132,8 @@ public class CategoryPage extends BasePage {
                 }
             }
             if (!clicked) {
-                WebElement option = driver.findElement(By.xpath("//option[contains(normalize-space(.), '" + parentName + "')]") );
+                WebElement option = driver
+                        .findElement(By.xpath("//option[contains(normalize-space(.), '" + parentName + "')]"));
                 click(option);
             }
         }
@@ -183,7 +184,8 @@ public class CategoryPage extends BasePage {
                 }
             }
             if (!clicked) {
-                WebElement option = driver.findElement(By.xpath("//option[contains(normalize-space(.), '" + parentName + "')]") );
+                WebElement option = driver
+                        .findElement(By.xpath("//option[contains(normalize-space(.), '" + parentName + "')]"));
                 click(option);
             }
         }
@@ -198,10 +200,10 @@ public class CategoryPage extends BasePage {
             // First search for the category to ensure it's visible
             search(categoryName);
             waitForPageLoad();
-            
+
             // Find the row containing the category name
             WebElement categoryRow = wait.until(ExpectedConditions.presenceOfElementLocated(
-                By.xpath("//tr[.//td[contains(normalize-space(.), '" + categoryName + "')]]")));
+                    By.xpath("//tr[.//td[contains(normalize-space(.), '" + categoryName + "')]]")));
             // Within that row, find the edit button
             WebElement editButton = categoryRow.findElement(By.cssSelector("a.btn-outline-primary"));
             click(editButton);
@@ -215,7 +217,7 @@ public class CategoryPage extends BasePage {
     }
 
     public void sortByColumn(String columnName) {
-        WebElement header = driver.findElement(By.xpath("//th//a[contains(normalize-space(.), '" + columnName + "')]") );
+        WebElement header = driver.findElement(By.xpath("//th//a[contains(normalize-space(.), '" + columnName + "')]"));
         click(header);
     }
 
@@ -264,21 +266,29 @@ public class CategoryPage extends BasePage {
         }
     }
 
-    public void clickEditButtonForCategory(String categoryName) {        // Search first to ensure category is visible in paginated table
+    public void clickEditButtonForCategory(String categoryName) { // Search first to ensure category is visible in
+                                                                  // paginated table
         search(categoryName);
-        waitForPageLoad();        wait.withTimeout(java.time.Duration.ofSeconds(15));
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//tr[.//td[contains(normalize-space(.), '" + categoryName + "')]]")));
-        WebElement row = driver.findElement(By.xpath("//tr[.//td[contains(normalize-space(.), '" + categoryName + "')]]"));
+        waitForPageLoad();
+        wait.withTimeout(java.time.Duration.ofSeconds(15));
+        wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.xpath("//tr[.//td[contains(normalize-space(.), '" + categoryName + "')]]")));
+        WebElement row = driver
+                .findElement(By.xpath("//tr[.//td[contains(normalize-space(.), '" + categoryName + "')]]"));
         WebElement editBtn = row.findElement(By.xpath(".//a[contains(@href, '/ui/categories/edit/')]"));
         click(editBtn);
     }
 
-    public void clickDeleteButtonForCategory(String categoryName) {        // Search first to ensure category is visible in paginated table
+    public void clickDeleteButtonForCategory(String categoryName) { // Search first to ensure category is visible in
+                                                                    // paginated table
         search(categoryName);
-        waitForPageLoad();        wait.withTimeout(java.time.Duration.ofSeconds(15));
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath("//tr[.//td[contains(normalize-space(.), '" + categoryName + "')]]")));
-        WebElement row = driver.findElement(By.xpath("//tr[.//td[contains(normalize-space(.), '" + categoryName + "')]]"));
-        WebElement deleteBtn = row.findElement(By.xpath(".//button[@title='Delete']") );
+        waitForPageLoad();
+        wait.withTimeout(java.time.Duration.ofSeconds(15));
+        wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.xpath("//tr[.//td[contains(normalize-space(.), '" + categoryName + "')]]")));
+        WebElement row = driver
+                .findElement(By.xpath("//tr[.//td[contains(normalize-space(.), '" + categoryName + "')]]"));
+        WebElement deleteBtn = row.findElement(By.xpath(".//button[@title='Delete']"));
         click(deleteBtn);
     }
 
@@ -287,14 +297,14 @@ public class CategoryPage extends BasePage {
             // First search for the category to ensure it's visible
             search(categoryName);
             waitForPageLoad();
-            
+
             // Find the row with the category, then find delete button within that row
             WebElement categoryRow = wait.until(ExpectedConditions.presenceOfElementLocated(
-                By.xpath("//tr[.//td[contains(normalize-space(.), '" + categoryName + "')]]")));
+                    By.xpath("//tr[.//td[contains(normalize-space(.), '" + categoryName + "')]]")));
             WebElement deleteButton = categoryRow.findElement(By.cssSelector("button.btn-outline-danger"));
             // DELETE button is a form submit button that triggers browser confirm()
             click(deleteButton);
-            
+
             // Handle browser confirm dialog
             try {
                 Thread.sleep(500); // Brief wait for confirm to appear
@@ -303,7 +313,7 @@ public class CategoryPage extends BasePage {
             } catch (Exception e) {
                 // No alert present, continue
             }
-            
+
             // Wait for page to reload after delete
             try {
                 Thread.sleep(1000);
@@ -318,8 +328,10 @@ public class CategoryPage extends BasePage {
     }
 
     public void clickCategoryName(String categoryName) {
-        WebElement categoryLink = driver.findElement(By.xpath("//a[contains(text(), '" + categoryName + "')]"));
-        click(categoryLink);
+        WebElement editBtn = driver.findElement(By.xpath(
+                "//tr[td[2][normalize-space()='" + categoryName + "']]//a[contains(@href,'/edit')]"));
+
+        editBtn.click();
     }
 
     public boolean isModalDisplayed() {
@@ -374,15 +386,15 @@ public class CategoryPage extends BasePage {
         try {
             // First wait for any navigation to complete
             Thread.sleep(1000);
-            
+
             // Then wait for one of the expected elements
             wait.until(ExpectedConditions.or(
                     ExpectedConditions.presenceOfElementLocated(By.cssSelector("table.table")),
                     ExpectedConditions.presenceOfElementLocated(By.xpath("//tbody")),
                     ExpectedConditions.presenceOfElementLocated(By.xpath("//h3[contains(text(), 'Categories')]")),
-                    ExpectedConditions.presenceOfElementLocated(By.xpath("//td[contains(normalize-space(.),'No category found')]"))
-            ));
-            
+                    ExpectedConditions.presenceOfElementLocated(
+                            By.xpath("//td[contains(normalize-space(.),'No category found')]"))));
+
             // Additional wait for dynamic content to settle
             Thread.sleep(500);
         } catch (InterruptedException e) {

@@ -202,9 +202,8 @@ public class AuthLoginSteps {
         int actualStatusCode = response.statusCode();
         if (actualStatusCode != statusCode) {
             String errorMessage = String.format(
-                "Expected status code %d but got %d. Response body: %s",
-                statusCode, actualStatusCode, response.getBody().asString()
-            );
+                    "Expected status code %d but got %d. Response body: %s",
+                    statusCode, actualStatusCode, response.getBody().asString());
             assertEquals(statusCode, actualStatusCode, errorMessage);
         } else {
             assertEquals(statusCode, actualStatusCode);
@@ -249,6 +248,7 @@ public class AuthLoginSteps {
     public void theResponseDoesNotContainScriptTags() {
         String responseBody = context.getResponse().getBody().asString();
         assertFalse(responseBody.toLowerCase().contains("<script>"), "Response should not contain script tags");
-        assertFalse(responseBody.toLowerCase().contains("</script>"), "Response should not contain script closing tags");
+        assertFalse(responseBody.toLowerCase().contains("</script>"),
+                "Response should not contain script closing tags");
     }
 }
