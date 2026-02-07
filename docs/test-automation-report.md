@@ -19,7 +19,7 @@ Start-Process "http://localhost:8081/overview-features.html
 ## Run Individual Test cases
 # Run the Sales feature file
 ```powershell
-mvn test "-Dcucumber.features=src/test/resources/features/auth_login.feature"
+mvn test "-Dcucumber.features=src/test/resources/features/auth_ui.feature"
 ```
 
 # Run a single scenario by tag (example: @AUTH-API-ADMIN-01 @positive @admin Login with valid admin credentials)

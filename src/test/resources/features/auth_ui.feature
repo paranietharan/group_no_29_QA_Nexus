@@ -47,6 +47,14 @@ Feature: UI Login Functionality
     When I click the logout button
     Then I should be redirected to the login page
 
+  @AUTH-UI-ADMIN-05B @positive @admin @ui
+  Scenario: AUTH-UI-ADMIN-05B Admin logout blocks browser back
+    Given admin is logged in
+    When I click the logout button
+    Then I should be redirected to the login page
+    When I press the browser back button
+    Then I should remain on the login page
+
   @AUTH-UI-ADMIN-06 @positive @admin @ui
   Scenario: AUTH-UI-ADMIN-06 Admin logout correctly works
     Given admin is logged out
@@ -92,6 +100,14 @@ Feature: UI Login Functionality
     Given user is logged in
     When I click the logout button
     Then I should be redirected to the login page
+
+  @AUTH-UI-USER-05B @positive @user @ui
+  Scenario: AUTH-UI-USER-05B User logout blocks browser back
+    Given user is logged in
+    When I click the logout button
+    Then I should be redirected to the login page
+    When I press the browser back button
+    Then I should remain on the login page
 
   @AUTH-UI-USER-06 @positive @user @ui
   Scenario: AUTH-UI-USER-06 User logout correctly works
