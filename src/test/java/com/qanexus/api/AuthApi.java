@@ -38,4 +38,26 @@ public class AuthApi {
 
         return response;
     }
+
+    public Response loginRaw(String payload) {
+        String endpoint = config.getLoginPath();
+        String fullUrl = config.getBaseUrl() + endpoint;
+
+        logger.info("=== LOGIN RAW REQUEST ===");
+        logger.info("URL: {}", fullUrl);
+        logger.info("Payload: {}", payload);
+
+        Response response = client.request()
+                .body(payload)
+                .post(endpoint);
+
+        logger.info("=== LOGIN RAW RESPONSE ===");
+        logger.info("Status: {}", response.statusCode());
+
+        if (response.statusCode() >= 400) {
+            logger.error("Error: {}", response.getBody().asString());
+        }
+
+        return response;
+    }
 }

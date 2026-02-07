@@ -1,6 +1,8 @@
 package com.qanexus.steps;
 
+import com.qanexus.api.ApiClient;
 import com.qanexus.api.AuthApi;
+import com.qanexus.api.Plant_Auth_client;
 import com.qanexus.support.TestContext;
 import com.qanexus.support.TestDataLoader;
 import io.cucumber.java.en.Given;
@@ -14,11 +16,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class AuthLoginSteps {
     private final TestContext context;
-    private final AuthApi authApi;
+    private final AuthApi authApi = new AuthApi();
+    private final ApiClient apiClient = new ApiClient();
+    private final Plant_Auth_client plantAuthClient = new Plant_Auth_client();
 
     public AuthLoginSteps(TestContext context) {
         this.context = context;
-        this.authApi = new AuthApi();
     }
 
     @Given("the authentication service is available")
@@ -94,6 +97,12 @@ public class AuthLoginSteps {
         context.setPassword("");
     }
 
+    @Given("credentials username {string} and password {string}")
+    public void credentialsUsernameAndPassword(String username, String password) {
+        context.setUsername(username);
+        context.setPassword(password);
+    }
+
     @Given("SQL injection payload in credentials")
     public void sqlInjectionPayloadInCredentials() {
         context.setUsername("admin' OR '1'='1");
@@ -124,15 +133,77 @@ public class AuthLoginSteps {
         context.setResponse(response);
     }
 
+    @When("the login request is sent with empty json")
+    public void theLoginRequestIsSentWithEmptyJson() {
+        Response response = authApi.loginRaw("{}");
+        context.setResponse(response);
+    }
+
+    @When("I access the categories endpoint without token")
+    public void iAccessTheCategoriesEndpointWithoutToken() {
+        Response response = apiClient.request()
+                .get("/api/categories");
+        context.setResponse(response);
+    }
+
+    @When("I access the categories endpoint with non-jwt token")
+    public void iAccessTheCategoriesEndpointWithNonJwtToken() {
+        Response response = apiClient.request()
+                .header("Authorization", "Bearer not-a-jwt")
+                .get("/api/categories");
+        context.setResponse(response);
+    }
+
+    @When("I access the categories endpoint with basic auth")
+    public void iAccessTheCategoriesEndpointWithBasicAuth() {
+        Response response = plantAuthClient.request()
+                .header("Authorization", "Basic dGVzdDp0ZXN0")
+                .get("/api/categories");
+        context.setResponse(response);
+    }
+
+    @When("I access the categories endpoint with admin token")
+    public void iAccessTheCategoriesEndpointWithAdminToken() {
+        String token = context.getToken();
+        assertNotNull(token, "Token should exist before accessing categories endpoint");
+        Response response = apiClient.request()
+                .header("Authorization", "Bearer " + token)
+                .get("/api/categories");
+        context.setResponse(response);
+    }
+
+    @When("I access the admin categories endpoint with user token")
+    public void iAccessTheAdminCategoriesEndpointWithUserToken() {
+        String token = context.getToken();
+        assertNotNull(token, "Token should exist before accessing admin endpoint");
+        String name = "Cat" + (System.currentTimeMillis() % 10000);
+        String payload = "{\"name\":\"" + name + "\"}";
+        Response response = apiClient.request()
+                .header("Authorization", "Bearer " + token)
+            .body(payload)
+            .post("/api/categories");
+        context.setResponse(response);
+    }
+
+    @When("I access the categories endpoint with user token")
+    public void iAccessTheCategoriesEndpointWithUserToken() {
+        String token = context.getToken();
+        assertNotNull(token, "Token should exist before accessing categories endpoint");
+        Response response = apiClient.request()
+                .header("Authorization", "Bearer " + token)
+                .get("/api/categories");
+        context.setResponse(response);
+    }
+
+
     @Then("the response status code is {int}")
     public void theResponseStatusCodeIs(int statusCode) {
         Response response = context.getResponse();
         int actualStatusCode = response.statusCode();
         if (actualStatusCode != statusCode) {
             String errorMessage = String.format(
-                "Expected status code %d but got %d. Response body: %s",
-                statusCode, actualStatusCode, response.getBody().asString()
-            );
+                    "Expected status code %d but got %d. Response body: %s",
+                    statusCode, actualStatusCode, response.getBody().asString());
             assertEquals(statusCode, actualStatusCode, errorMessage);
         } else {
             assertEquals(statusCode, actualStatusCode);
@@ -177,6 +248,7 @@ public class AuthLoginSteps {
     public void theResponseDoesNotContainScriptTags() {
         String responseBody = context.getResponse().getBody().asString();
         assertFalse(responseBody.toLowerCase().contains("<script>"), "Response should not contain script tags");
-        assertFalse(responseBody.toLowerCase().contains("</script>"), "Response should not contain script closing tags");
+        assertFalse(responseBody.toLowerCase().contains("</script>"),
+                "Response should not contain script closing tags");
     }
 }

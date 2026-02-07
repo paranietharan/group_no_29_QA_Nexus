@@ -41,5 +41,16 @@ mvn test "-Dcucumber.filter.tags=@auth"
 | XML         | `target/cucumber-report.xml` |
 | Advanced    | `target/cucumber-advanced-report/cucumber-html-reports/overview-features.html` |
 
+# Paranietharan
+- Run only auth_api.feature
+```powershell
+mvn clean test "-Dcucumber.features=src/test/resources/features/auth_api.feature"
+```
+
+Run only auth_ui.feature
+```powershell
+mvn clean test "-Dcucumber.features=src/test/resources/features/auth_ui.feature"
+```
+
 ## Notes
 - When you open the .html report, you may get 404 error. So follow the steps to run the report server.

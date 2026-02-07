@@ -29,6 +29,7 @@ Thumbs.db
 *.html
 /surefire-reports/
 /allure-results/
+.allure/
 
 # Misc
 *.swp
