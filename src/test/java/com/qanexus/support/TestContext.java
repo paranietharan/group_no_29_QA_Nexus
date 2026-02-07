@@ -12,6 +12,7 @@ public class TestContext {
     private Long categoryId;
     private Long parentCategoryId;
     private String categoryName;
+    private String parentCategoryName;
     private List<Map<String, Object>> categoryList;
     private String userRole;
     private int currentPage;
@@ -63,6 +64,14 @@ public class TestContext {
 
     public void setParentCategoryId(Long parentCategoryId) {
         this.parentCategoryId = parentCategoryId;
+    }
+
+    public String getParentCategoryName() {
+        return parentCategoryName;
+    }
+
+    public void setParentCategoryName(String parentCategoryName) {
+        this.parentCategoryName = parentCategoryName;
     }
 
     public String getCategoryName() {

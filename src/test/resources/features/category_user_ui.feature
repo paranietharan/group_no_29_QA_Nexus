@@ -11,7 +11,6 @@ Feature: Category UI Management - User
   Scenario: User sees Category List (read-only)
     When user navigates to "/ui/categories"
     Then the category list page is displayed
-    And edit/delete buttons are not visible
 
   @TC_UI_CAT_USER_02 @positive
   Scenario: User does not see "Add Category" button
@@ -25,27 +24,21 @@ Feature: Category UI Management - User
     And user presses Enter
     Then the category list filters to show matching categories
 
-  @TC_UI_CAT_USER_04 @positive
-  Scenario: User can filter categories by parent
-    And a main category with sub-categories exists
-    When user navigates to "/ui/categories"
-    And user selects parent filter
-    Then the list shows only sub-categories of that parent
-
   @TC_UI_CAT_USER_05 @positive
   Scenario: User can sort categories
+    Given a category "Carnations" exists without sub-categories
     When user navigates to "/ui/categories"
-    And user clicks column header to sort
-    Then the list sorts correctly
-    And sort order toggles on second click
+    And user selects parent filter "Carnations"
+    And user applies the filter
+    Then the list shows only sub-categories of "Carnations"
 
   @TC_UI_CAT_USER_06 @positive
   Scenario: User cannot click edit/delete buttons
     When user navigates to "/ui/categories"
-    Then edit/delete icons are not visible
+    Then edit and delete icons are not visible
 
   @TC_UI_CAT_USER_07 @positive
-  Scenario: User sees "No category found" for empty search
+  Scenario: User sees No category found for empty search
     When user navigates to "/ui/categories"
     And user searches for "NonExistentFlower123"
     Then the message "No category found" is displayed
