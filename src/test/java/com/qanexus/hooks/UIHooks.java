@@ -22,6 +22,16 @@ public class UIHooks {
             byte[] screenshot = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
             scenario.attach(screenshot, "image/png", "failure-screenshot");
         }
+            if (scenario.isFailed() && driver != null) {
+                // Capture page HTML for debugging
+                try {
+                    String pageSource = driver.getPageSource();
+                    scenario.attach(pageSource.getBytes(), "text/html", "failure-page-source.html");
+                    scenario.log("Current URL: " + driver.getCurrentUrl());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         DriverFactory.quitDriver();
     }
 }
