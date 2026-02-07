@@ -9,6 +9,8 @@ public class TestContext {
     private String password;
     private Response response;
     private String token;
+    private Long plantId;
+    private String plantName;
     private Long categoryId;
     private Long parentCategoryId;
     private String categoryName;
@@ -50,20 +52,12 @@ public class TestContext {
         this.token = token;
     }
 
-    public Long getCategoryId() {
-        return categoryId;
+    public Long getPlantId() {
+        return plantId;
     }
 
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
-    }
-
-    public Long getParentCategoryId() {
-        return parentCategoryId;
-    }
-
-    public void setParentCategoryId(Long parentCategoryId) {
-        this.parentCategoryId = parentCategoryId;
+    public void setPlantId(Long plantId) {
+        this.plantId = plantId;
     }
 
     public String getParentCategoryName() {
@@ -112,5 +106,30 @@ public class TestContext {
 
     public void setPageSize(int pageSize) {
         this.pageSize = pageSize;
+    }
+
+    // categoryId
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public Long getParentCategoryId() {
+        return parentCategoryId;
+    }
+
+    public void setParentCategoryId(Long parentCategoryId) {
+        this.parentCategoryId = parentCategoryId;
+    }
+
+    public String getPlantName() {
+        return plantName;
+    }
+
+    public void setPlantName(String plantName) {
+        this.plantName = plantName;
     }
 }

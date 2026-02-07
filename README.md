@@ -18,3 +18,4 @@ IS4600 ITQA Test automation Assignment
 
 - [Test Automation Docs](docs/test-automation-report.md)
 - [Configuration Docs](docs/config.md)
+- [Allure Report Docs](docs/allure-report.md)

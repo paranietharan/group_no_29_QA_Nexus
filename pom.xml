@@ -20,6 +20,7 @@
     <selenium.version>4.18.1</selenium.version>
     <jackson.version>2.17.0</jackson.version>
     <slf4j.version>2.0.12</slf4j.version>
+    <allure.version>2.26.0</allure.version>
   </properties>
 
   <dependencies>
@@ -84,6 +85,12 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>io.qameta.allure</groupId>
+      <artifactId>allure-cucumber7-jvm</artifactId>
+      <version>${allure.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>io.cucumber</groupId>
       <artifactId>cucumber-picocontainer</artifactId>
       <version>${cucumber.version}</version>
@@ -110,6 +117,9 @@
         <configuration>
           <useModulePath>false</useModulePath>
           <testFailureIgnore>true</testFailureIgnore>
+          <systemPropertyVariables>
+            <allure.results.directory>${project.build.directory}/allure-results</allure.results.directory>
+          </systemPropertyVariables>
           <includes>
             <include>**/*Test.java</include>
           </includes>
@@ -146,6 +156,15 @@
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>io.qameta.allure</groupId>
+        <artifactId>allure-maven</artifactId>
+        <version>2.12.0</version>
+        <configuration>
+          <resultsDirectory>${project.build.directory}/allure-results</resultsDirectory>
+          <reportDirectory>${project.build.directory}/allure-report</reportDirectory>
+        </configuration>
       </plugin>
     </plugins>
   </build>

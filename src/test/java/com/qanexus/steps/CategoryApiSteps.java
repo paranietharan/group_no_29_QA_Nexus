@@ -396,7 +396,7 @@ public class CategoryApiSteps {
                 "Error message should mention duplicate or already exists");
     }
 
-    @Then("the response contains validation error for name length")
+    @Then("the category response contains validation error for name length")
     public void theResponseContainsValidationErrorForNameLength() {
         String errorMessage = context.getResponse().jsonPath().getString("message");
         assertTrue(errorMessage.toLowerCase().contains("length") ||

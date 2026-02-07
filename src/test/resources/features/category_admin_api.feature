@@ -54,13 +54,13 @@ Feature: Category API Management - Admin
   Scenario: Admin creates category with short name
     When admin attempts to create category with name "AB"
     Then the response status code is 400
-    And the response contains validation error for name length
+    And the category response contains validation error for name length
 
   @TC_API_CAT_ADMIN_08 @negative
   Scenario: Admin creates category with long name
     When admin attempts to create category with name "VeryLongFlowerNameTooLong"
     Then the response status code is 400
-    And the response contains validation error for name length
+    And the category response contains validation error for name length
 
   @TC_API_CAT_ADMIN_09 @negative
   Scenario: Admin deletes category with sub-categories
