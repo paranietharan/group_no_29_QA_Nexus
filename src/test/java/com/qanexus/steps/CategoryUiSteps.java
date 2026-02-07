@@ -27,7 +27,6 @@ public class CategoryUiSteps {
     private String getUniqueName(String baseName) {
         String timestamp = String.valueOf(System.currentTimeMillis());
         String shortId = timestamp.substring(timestamp.length() - 4);
-        // Truncate base name if needed (max 10 chars total), keep at least 3 chars
         int maxBaseLen = 6;
         String prefix = baseName.length() > maxBaseLen ? baseName.substring(0, maxBaseLen) : baseName;
         return prefix + shortId;
@@ -136,7 +135,6 @@ public class CategoryUiSteps {
     @When("admin selects parent category {string}")
     public void adminSelectsParentCategory(String parentName) {
         String actualParent = parentName;
-        // If we have a stored parent name that looks relevant (starts with parentName), use it
         if (context.getParentCategoryName() != null && context.getParentCategoryName().startsWith(parentName.substring(0, Math.min(parentName.length(), 3)))) {
              actualParent = context.getParentCategoryName();
         }
@@ -167,8 +165,6 @@ public class CategoryUiSteps {
     public void theNewSubCategoryAppearsUnder(String subCategoryName, String parentName) {
         categoryPage.waitForPageLoad();
         String actualSub = context.getCategoryName() != null ? context.getCategoryName() : subCategoryName;
-        // Parent check - handled by simple list check or hierarchy?
-        // Original code just checked if sub is present. Keeping same logic but using unique name.
         assertTrue(categoryPage.isCategoryInList(actualSub), 
                    "Sub-category " + actualSub + " should appear in the list");
     }
@@ -187,14 +183,6 @@ public class CategoryUiSteps {
     @Then("the category name is updated to {string} in the list")
     public void theCategoryNameIsUpdatedToInTheList(String newName) {
         categoryPage.waitForPageLoad();
-        // For update, newName passed might be "Carnations", but if we uniqued it?
-        // adminChangesTheNameTo actually calls enterCategoryName directly
-        // I should update adminChangesTheNameTo to ALSO unique-ify if needed?
-        // But usually update sets it to a specific value.
-        // Let's assume update changes it to "Carnations" (non-unique). 
-        // If system requires unique, this might fail.
-        // Better: Use unique there too.
-        // But checking `context.categoryName` here is tricky if `adminChanges` didn't update context.
         assertTrue(categoryPage.isCategoryInList(newName), "Updated category name should be visible in the list");
     }
 
@@ -263,12 +251,9 @@ public class CategoryUiSteps {
     @When("{word} selects parent filter {string}")
     public void adminSelectsParentFilter(String role, String parentName) {
         String actualParent = parentName;
-        // If we have a stored category name that looks relevant (starts with parentName), use it
-        // Note: For filtering, we might be filtering by a parent created in a previous step (stored in context)
         if (context.getParentCategoryName() != null && context.getParentCategoryName().startsWith(parentName.substring(0, Math.min(parentName.length(), 3)))) {
              actualParent = context.getParentCategoryName();
         } else if (context.getCategoryName() != null && context.getCategoryName().startsWith(parentName.substring(0, Math.min(parentName.length(), 3)))) {
-             // Fallback: maybe the "Category" we just created is the one we want to filter by
              actualParent = context.getCategoryName();
         }
         categoryPage.selectParentFilter(actualParent);
@@ -395,7 +380,6 @@ public class CategoryUiSteps {
 
     @When("user clicks on a category name")
     public void userClicksOnACategoryName() {
-        // search for 'Roses' category created in API test
         categoryPage.search("Roses");
         categoryPage.clickCategoryName("Roses");
     }
@@ -439,7 +423,7 @@ public class CategoryUiSteps {
             String actualName = resp.jsonPath().getString("name");
             context.setCategoryId(id);
             context.setCategoryName(actualName);
-            context.setParentCategoryName(actualName); // Store as potential parent
+            context.setParentCategoryName(actualName);
         }
     }
 
