@@ -2,7 +2,7 @@
 Feature: Sales API - User Role
 
 Background:
-  Given the user is authenticated
+  Given the user is authenticated for sales api
 
 @TC_API_SALES_USER_01
 Scenario: Fetch all sales

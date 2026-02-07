@@ -2,7 +2,7 @@
 Feature: Sales API - Admin Role
 
 Background:
-  Given the admin is authenticated
+  Given the admin is authenticated for sales api
 
 @TC_API_SALES_ADMIN_01
 Scenario: Delete an existing sale

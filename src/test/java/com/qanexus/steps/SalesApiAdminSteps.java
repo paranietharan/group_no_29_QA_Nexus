@@ -28,8 +28,8 @@ public class SalesApiAdminSteps {
 
     // ================= AUTH =================
 
-    @Given("the admin is authenticated")
-    public void theAdminIsAuthenticated() {
+    @Given("the admin is authenticated for sales api")
+    public void theAdminIsAuthenticatedForSalesApi() {
         Response res = authApi.login("admin", "admin123"); // <-- use your real admin creds
         assertEquals(200, res.statusCode(), "Admin login failed");
 

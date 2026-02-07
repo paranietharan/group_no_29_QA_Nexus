@@ -28,8 +28,8 @@ public class SalesApiSteps {
 
     // ================= AUTH =================
 
-    @Given("the user is authenticated")
-    public void userAuthenticated() {
+    @Given("the user is authenticated for sales api")
+    public void userAuthenticatedForSalesApi() {
 
         Response response = authApi.login("testuser", "test123");
         assertEquals(200, response.statusCode());
