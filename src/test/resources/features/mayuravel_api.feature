@@ -5,7 +5,7 @@ Feature: Mayuravel API Test Cases - Categories, Plants, and Sales
   So that I can verify the functionality for different user roles
 
   Background:
-    Given the API service is available
+    Given the Mayuravel API service is available
 
   @TC-API-ADMIN-01 @positive @admin @pagination
   Scenario: TC-API-ADMIN-01 Admin fetches paginated categories successfully
@@ -74,7 +74,7 @@ Feature: Mayuravel API Test Cases - Categories, Plants, and Sales
   @TC-API-ADMIN-15 @positive @admin @consistency
   Scenario: TC-API-ADMIN-15 Admin cross-module consistency
     Given admin is authenticated
-    And a category with plants exists
+    And a Mayuravel category with plants exists
     When admin deletes the category via API
     And admin fetches plants under that category
     Then the plants show error or null category

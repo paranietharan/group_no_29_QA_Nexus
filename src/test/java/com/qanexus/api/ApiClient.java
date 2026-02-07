@@ -7,7 +7,6 @@ import io.restassured.filter.log.ResponseLoggingFilter;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
-
 import java.util.Map;
 
 public class ApiClient {
@@ -82,5 +81,17 @@ public class ApiClient {
                 .header("Authorization", "Bearer " + token)
                 .body(body)
                 .patch(endpoint);
+    }
+
+    // getWithAuth with path parameters
+    public Response getWithAuthPathParams(String endpoint, String token, Map<String, String> pathParams) {
+        RequestSpecification req = request()
+                .header("Authorization", "Bearer " + token);
+        
+        if (pathParams != null && !pathParams.isEmpty()) {
+            req.pathParams(pathParams);
+        }
+        
+        return req.get(endpoint);
     }
 }

@@ -137,7 +137,7 @@ public class MayuravelApiSteps {
                 "Status code should be " + status1 + " or " + status2 + " but got " + actualStatus);
     }
 
-    @Given("a category with plants exists")
+    @Given("a Mayuravel category with plants exists")
     public void aCategoryWithPlantsExists() {
         // Create a test category
         Map<String, Object> categoryData = new HashMap<>();
@@ -306,7 +306,7 @@ public class MayuravelApiSteps {
                 "Should get access denied (403/401) but got " + statusCode);
     }
 
-    @Given("the API service is available")
+    @Given("the Mayuravel API service is available")
     public void theApiServiceIsAvailable() {
         String baseUrl = System.getProperty("api.baseUrl", "http://localhost:8080");
         logger.info("Checking API service availability at: {}", baseUrl);
