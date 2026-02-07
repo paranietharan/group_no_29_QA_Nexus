@@ -20,3 +20,4 @@ IS4600 ITQA Test automation Assignment
 - [Configuration Docs](docs/config.md)
 - [Allure Report Docs](docs/allure-report.md)
 - [Instructions to Run Individual Test Cases](docs/run-individual-test-cases.md)
+- [Database Backup](docs/database-backup.md)
